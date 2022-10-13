@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "pc-api-8205119077610338397-333",
+  "private_key_id": "6e78819e6b4bc3a78fb74d7f0be5fef4491c0022",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCK1AdBuRQWGsck\nsSK7BwTKFB8fYDGVspdHdgjUbRoHbkC+rVwslXiMsBhEBd5NP7UbeQ8l4xX4XsU+\n9c6mWpsEpmIbJ5GK5jmT35gdLmiAXOfHMP3iE41oYXyZL3vZofuL4zPIJ6TwSTsw\nltbyGNawwJ1+RWgUL5XtWAyERmQvXlAVl8WLE00tIh1LSlyZs+u5m4FjCyYUFx6Q\nJVRa14ltjAeZecfjWExvRT8q/vfUD3IZw6ZESzja136fqPC0OeF8RObXGxiJTqnz\n7KHKbc+eGxTqe6dKGA3Eg5TL/iCWowRdAU3TKEAIBiTXzOduHOBUcLGXTqqgwoLg\nVxSkW0nlAgMBAAECggEAC/Lf2lpG+PgTt9Fp1IBwJcHBmVO623rkO7RUYjmEX1YF\nSzlkkOR0hwyzqfckq7AWCGf3qSJ4cPNx3/oMGpP7JP/6Za1BgPD7zQHA9+dXUI+u\ngJ3I3D0j6J4AuWE1ia/AFMmDWsYpaL0E09PHwE0+/TY21/gP/dzH91uistJ+1ky+\nowUlfA1SFFGCJFTr9e2LvW/NxDik6S/rjiA6NFyOGSRNI03Q7mzqzVgK2fXHAakr\nRrvNYOzuzVjwS9ZDMXUwm7g4rNofqACyiKUjHAXAXcY9TOSANe1n5Vy7ZrnD5ov5\n3xOXb8um34oSUy1MDTXsayfnFUbngwkHdzTclMG66QKBgQDDQ1kvEjpmWz7QcxDm\nmJbhpcEKluCsbUSfaCQdPSrvbXh17nBlroG7uLA9w6VbgHYB6CnN2EJ4hn50m2qT\nhAcR7JuiWH9GxunGiXNFNTYUIGL8KwgKipMf9YyrOfmATLBp29M7EmgXI2XpvN4W\nx2NCfSMjpSITNqfaIUFvsJM3vwKBgQC2AtDimnx2T/w9qcNEEqeCD3TmI+Qbl4kH\n0pnA4I1LplkOMP/P2Epckcg4h+hgmHSDWbuLx5N9VDVSiVEECP+8ICDiO7xh7Pqp\n7Z7cTab/f7gEg/I3P5y/sWfa+yq4ilbLQrHJYOjDilP14dsnMSZIzTaEuYjeP2NA\ngI9QtI/HWwKBgQCvt87tRkkZzak0ayhdbBnzzHdxMR/U66wii9RcH6ygtHIAJugt\nCSKkrWqk2ojXVD5eLvBX1vLSha4M/8OkJt856SSRr3QyXFUKnq0GLgGRkSei6JKe\n8d++lfnWKSD3rYvgZ7uqYEEd+XQAKT/vXdVcg0J5FGUax0e8S8sYWN3S/wKBgQCG\na6P7hx6efkoK/GJy1tgRTPsHsMAZxJt2RIo7EVwo36zrtzJmPRYGMcBOR8lN9aov\nC8lf3UBHEjbjQvirYz4DoTLIAlgJdmxVrWFi0JKiJaAw7YWoWfmY9Rt/dXnCmqCp\nMxN8Z27gYzvI30nsMvdUUwKNmTzE7smNbKTrdL6u+wKBgQC0RI9duARKgyIVcGDa\nH2hzKoaNBEC2aQoXrQ6jDSkYB7HEJl21WrL+OrKMtWE2bE3RS56E7LQMp1ksq3AR\nINYr4rF9dPRwAjbYXMURQXlA7O7XCpeTsV2oupR33tQeO5E/I4WdZLonb3WJZl/s\nQJEDB6qejDmBgc2Wzw4yrlFTZA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "playnanoo@pc-api-8205119077610338397-333.iam.gserviceaccount.com",
+  "client_id": "108516484546570044858",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/playnanoo%40pc-api-8205119077610338397-333.iam.gserviceaccount.com"
+}
