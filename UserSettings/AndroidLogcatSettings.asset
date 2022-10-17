@@ -1,5 +1,5 @@
 {
-    "m_SelectedDeviceId": "127.0.0.1:5555",
+    "m_SelectedDeviceId": "emulator-5554",
     "m_SelectedPackage": {
         "deviceId": "",
         "name": "",
@@ -12,6 +12,48 @@
             "deviceId": "127.0.0.1:5555",
             "name": "com.bluestacks.launcher",
             "processId": 2346,
+            "exited": true
+        },
+        {
+            "deviceId": "127.0.0.1:5555",
+            "name": "com.bluestacks.launcher",
+            "processId": 2299,
+            "exited": false
+        },
+        {
+            "deviceId": "127.0.0.1:5555",
+            "name": "com.gemadong.unityiap",
+            "processId": 16364,
+            "exited": true
+        },
+        {
+            "deviceId": "RF9RA00Z7ZT",
+            "name": "com.gemadong.unityiap",
+            "processId": 27619,
+            "exited": true
+        },
+        {
+            "deviceId": "RF9RA00Z7ZT",
+            "name": "com.gemadong.unityiap",
+            "processId": 28501,
+            "exited": false
+        },
+        {
+            "deviceId": "emulator-5554",
+            "name": "com.gemadong.unityiap",
+            "processId": 3989,
+            "exited": true
+        },
+        {
+            "deviceId": "emulator-5554",
+            "name": "com.gemadong.unityiap",
+            "processId": 20714,
+            "exited": true
+        },
+        {
+            "deviceId": "emulator-5554",
+            "name": "com.bluestacks.launcher",
+            "processId": 2364,
             "exited": false
         }
     ],

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "232879415191",
+    "project_id": "unityiap-97395326",
+    "storage_bucket": "unityiap-97395326.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:232879415191:android:55575bbe989bb059056ed2",
+        "android_client_info": {
+          "package_name": "com.gemadong.unityiap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "232879415191-gngrmml9pcmnh35djadf8dlusl0bmedl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeRRuXQmASK8yDvsF3uK7x1Cw_tO-2UK0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "232879415191-gngrmml9pcmnh35djadf8dlusl0bmedl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "232879415191-9fprp835r4kno8qmkitmjggq6mj2lakd.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gemadong.unityiap"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
