@@ -4,17 +4,10 @@ using UnityEngine;
 using System.Threading.Tasks;
 using Google;
 using PlayNANOO;
-using AppleAuth;
-using AppleAuth.Native;
-using AppleAuth.Enums;
-using AppleAuth.Extensions;
-using AppleAuth.Interfaces;
-using System.Text;
 
 public class PlayNAOOLogin : MonoBehaviour
 {
     Plugin plugin;
-    IAppleAuthManager _appleAuthManager;
     GoogleSignInConfiguration googleSignInConfiguration;
 
     void Start()
@@ -25,15 +18,8 @@ public class PlayNAOOLogin : MonoBehaviour
             RequestIdToken = true,
             WebClientId = "232879415191-t7kqtngfpofp8ct3f2lqeoe80p8oqlnk.apps.googleusercontent.com",
         };
-        if (AppleAuthManager.IsCurrentPlatformSupported)
-        {
-            var deserializer = new PayloadDeserializer();
-            _appleAuthManager = new AppleAuthManager(deserializer);
-        }
-    }
-    private void Update()
-    {
-        _appleAuthManager?.Update();
+
+        TokenLogin();
     }
 
     public void SignIn()
@@ -148,6 +134,10 @@ public class PlayNAOOLogin : MonoBehaviour
                     {
                         Debug.Log(values["WithdrawalKey"].ToString());
                     }
+                    else if(values["ErrorCode"].ToString() == "30002")
+                    {
+                        TokenRefresh();
+                    }
                     else
                     {
                         Debug.Log("Fail");
@@ -178,7 +168,6 @@ public class PlayNAOOLogin : MonoBehaviour
 
     public void AppleSignIn()
     {
-#if UNITY_ANDROID
         plugin.OpenAppleID((status, errorCode, jsonString, values) =>
         {
             if (status == Configure.PN_API_STATE_SUCCESS)
@@ -211,58 +200,41 @@ public class PlayNAOOLogin : MonoBehaviour
                 }
             }
         });
-#endif
-#if UNITY_IOS
-        var loginArgs = new AppleAuthLoginArgs();
-
-        this._appleAuthManager.LoginWithAppleId(
-            loginArgs,
-            credential =>
+    }
+    public void TokenRefresh()
+    {
+        plugin.AccountTokenRefresh((status, errorCode, jsonString, values) => {
+            if (status.Equals(Configure.PN_API_STATE_SUCCESS))
             {
-                var appleIdCredential = credential as IAppleIDCredential;
-                if (appleIdCredential != null)
-                {
-                    string idToken = Encoding.UTF8.GetString(appleIdCredential.IdentityToken, 0, appleIdCredential.IdentityToken.Length);
-                    plugin.AccountSocialSignIn(idToken, Configure.PN_ACCOUNT_APPLE_ID, (status, errorCode, jsonString, values) =>
-                    {
-                        if (status == Configure.PN_API_STATE_SUCCESS)
-                        {
-                            Debug.Log(values["access_token"].ToString());
-                            Debug.Log(values["refresh_token"].ToString());
-                            Debug.Log(values["uuid"].ToString());
-                            Debug.Log(values["openID"].ToString());
-                            Debug.Log(values["nickname"].ToString());
-                            Debug.Log(values["linkedID"].ToString());
-                            Debug.Log(values["linkedType"].ToString());
-                            Debug.Log(values["country"].ToString());
-                        }
-                        else
-                        {
-                            if (values != null)
-                            {
-                                if (values["ErrorCode"].ToString() == "30007")
-                                {
-                                    Debug.Log(values["WithdrawalKey"].ToString());
-                                }
-                                else
-                                {
-                                    Debug.Log("Fail");
-                                }
-                            }
-                            else
-                            {
-                                Debug.Log("Fail");
-                            }
-                        }
-                    });
-                }
-            },
-            error =>
-            {
-                // Something went wrong
-                var authorizationErrorCode = error.GetAuthorizationErrorCode();
+                Debug.Log(values["access_token"].ToString());
+                Debug.Log(values["refresh_token"].ToString());
+                Debug.Log(values["uuid"].ToString());
+                Debug.Log(values["openID"].ToString());
+                Debug.Log(values["nickname"].ToString());
+                Debug.Log(values["linkedID"].ToString());
+                Debug.Log(values["linkedType"].ToString());
+                Debug.Log(values["country"].ToString());
+                TokenLogin();
             }
-            );
-#endif
+            else
+            {
+                if (values != null)
+                {
+                    if (values["ErrorCode"].ToString() == "30007")
+                    {
+                        Debug.Log(values["WithdrawalKey"].ToString());
+                    }
+                    else
+                    {
+                        Debug.Log("Fail");
+                    }
+                }
+                else
+                {
+                    Debug.Log("Fail");
+                }
+            }
+        });
     }
 }
+

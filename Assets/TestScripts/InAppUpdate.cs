@@ -1,11 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-#if UNITY_ANDROID
 using Google.Play.AppUpdate;
 using Google.Play.Common;
-#endif
 
 public class InAppUpdate : MonoBehaviour
 {
@@ -13,11 +10,9 @@ public class InAppUpdate : MonoBehaviour
 
     public void UpdateTest()
     {
-#if UNITY_ANDROID
         StartCoroutine(CheckForUpdate());
-#endif
     }
-#if UNITY_ANDROID
+
     public IEnumerator CheckForUpdate()
     {
         AppUpdateManager appUpdateManager = new AppUpdateManager();
@@ -47,5 +42,4 @@ public class InAppUpdate : MonoBehaviour
             Debug.Log("NO Update");
         }
     }
-#endif
 }
