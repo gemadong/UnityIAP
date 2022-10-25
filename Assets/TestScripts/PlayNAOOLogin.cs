@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Threading.Tasks;
 using Google;
 using PlayNANOO;
+using Facebook.Unity;
 
 public class PlayNAOOLogin : MonoBehaviour
 {
@@ -18,10 +19,94 @@ public class PlayNAOOLogin : MonoBehaviour
             RequestIdToken = true,
             WebClientId = "232879415191-t7kqtngfpofp8ct3f2lqeoe80p8oqlnk.apps.googleusercontent.com",
         };
-
-        TokenLogin();
+        
+        if (!FB.IsInitialized)
+        {
+            FB.Init(OnFBInitComplete, OnFBHideUnity);
+        }
+        else
+        {
+            FB.ActivateApp();
+        }
+    }
+    #region FacebookLogin
+    void OnFBInitComplete()
+    {
+        if (FB.IsInitialized)
+        {
+            FB.ActivateApp();
+        }
+        else
+        {
+            Debug.Log("Failed to Initialize the Facebook SDK");
+        }
     }
 
+    void OnFBHideUnity(bool isShow)
+    {
+        if (!isShow)
+        {
+            Time.timeScale = 0;
+        }
+        else
+        {
+            Time.timeScale = 1;
+        }
+    }
+
+    public void FacebookSignIn()
+    {
+        var para = new List<string>() { "public_profile", "email" };
+        FB.LogInWithReadPermissions(para, FacebookAuthCallback);
+    }
+
+    void FacebookAuthCallback(ILoginResult result)
+    {
+        if (FB.IsLoggedIn)
+        {
+            Debug.Log("result.RawResult : "+result.RawResult);
+            
+            plugin.AccountSocialSignIn(result.AccessToken.TokenString, Configure.PN_ACCOUNT_FACEBOOK, (status, errorCode, jsonString, values) =>
+            {
+                if (status.Equals(Configure.PN_API_STATE_SUCCESS))
+                {
+                    Debug.Log(values["access_token"].ToString());
+                    Debug.Log(values["refresh_token"].ToString());
+                    Debug.Log(values["uuid"].ToString());
+                    Debug.Log(values["openID"].ToString());
+                    Debug.Log(values["nickname"].ToString());
+                    Debug.Log(values["linkedID"].ToString());
+                    Debug.Log(values["linkedType"].ToString());
+                    Debug.Log(values["country"].ToString());
+                }
+                else
+                {
+                    if (values != null)
+                    {
+                        if (values["ErrorCode"].ToString() == "30007")
+                        {
+                            Debug.Log(values["WithdrawalKey"].ToString());
+                        }
+                        else
+                        {
+                            Debug.Log("Fail");
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("Fail");
+                    }
+                }
+            });
+        }
+        else
+        {
+            Debug.Log("Login Cancel");
+        }
+    }
+    #endregion
+
+    #region GoogleLogin
     public void SignIn()
     {
         GoogleSignIn.Configuration = googleSignInConfiguration;
@@ -53,17 +138,11 @@ public class PlayNAOOLogin : MonoBehaviour
         }
         else
         {
-            Debug.Log(task.Result.IdToken);
-
             StartCoroutine(SocialLogin(task.Result.IdToken));
         }
     }
 
     private string _storedToken;
-    public void Login()
-    {
-        Login(_storedToken);
-    }
 
     IEnumerator SocialLogin(string token)
     {
@@ -73,7 +152,6 @@ public class PlayNAOOLogin : MonoBehaviour
 
         yield break;
     }
-
     private void Login(string token)
     {
         Debug.Log("Login Started");
@@ -112,6 +190,9 @@ public class PlayNAOOLogin : MonoBehaviour
         });
         Debug.Log("Login Called");
     }
+    #endregion
+
+    #region TokenLogin
     public void TokenLogin()
     {
         plugin.AccountTokenSignIn((status, errorCode, jsonString, values) => {
@@ -150,14 +231,16 @@ public class PlayNAOOLogin : MonoBehaviour
             }
         });
     }
+    #endregion
 
-
+    #region TokenOut
     public void TokenLogOut()
     {
         plugin.AccountTokenSignOut((status, errorCode, jsonString, values) => {
             if (status.Equals(Configure.PN_API_STATE_SUCCESS))
             {
                 Debug.Log(values["status"].ToString());
+                GoogleSignIn.DefaultInstance.SignOut();
             }
             else
             {
@@ -165,7 +248,9 @@ public class PlayNAOOLogin : MonoBehaviour
             }
         });
     }
+    #endregion
 
+    #region AppleLogin
     public void AppleSignIn()
     {
         plugin.OpenAppleID((status, errorCode, jsonString, values) =>
@@ -201,6 +286,9 @@ public class PlayNAOOLogin : MonoBehaviour
             }
         });
     }
+    #endregion
+
+    #region TokenRefresh
     public void TokenRefresh()
     {
         plugin.AccountTokenRefresh((status, errorCode, jsonString, values) => {
@@ -236,5 +324,6 @@ public class PlayNAOOLogin : MonoBehaviour
             }
         });
     }
+    #endregion
 }
 
