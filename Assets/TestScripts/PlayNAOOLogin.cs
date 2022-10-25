@@ -54,7 +54,7 @@ public class PlayNAOOLogin : MonoBehaviour
 #endif
 
 
-    #region FacebookLogin
+#region FacebookLogin
     void OnFBInitComplete()
     {
         if (FB.IsInitialized)
@@ -367,7 +367,7 @@ public class PlayNAOOLogin : MonoBehaviour
     }
 #endregion
 
-    #region TokenRefresh
+#region TokenRefresh
     public void TokenRefresh()
     {
         plugin.AccountTokenRefresh((status, errorCode, jsonString, values) => {

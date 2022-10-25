@@ -6,15 +6,18 @@ using Firebase;
 using Firebase.Messaging;
 using Firebase.Analytics;
 using PlayNANOO;
+#if UNITY_IOS
+using NotificationServices = UnityEngine.iOS.NotificationServices;
+using NotificationType = UnityEngine.iOS.NotificationType;
+#endif
 
 public class FirebaseManager : MonoBehaviour
 {
     [SerializeField] private Text FcmEnable;
     [SerializeField] private Text NightEnable;
     Plugin plugin;
-
-    bool isnightEnabled;
-    bool isfcmEnabled;
+    bool isnightEnabled = true;
+    bool isfcmEnabled = true;
     void Start()
     {
         plugin = Plugin.GetInstance();
@@ -43,6 +46,12 @@ public class FirebaseManager : MonoBehaviour
             }
         });
 
+#if UNITY_IOS
+        NotificationServices.RegisterForNotifications(NotificationType.Alert | NotificationType.Badge | NotificationType.Sound, true);
+        byte[] token = NotificationServices.deviceToken;
+        Debug.Log("token :" + token);
+        if (token != null) SaveToken(System.BitConverter.ToString(token).Replace("-", ""), true, true);
+#endif
     }
 #if UNITY_ANDROID
     IEnumerator AndroidToken(bool isEnabled, bool isNightEnabled)
@@ -66,19 +75,56 @@ public class FirebaseManager : MonoBehaviour
             }
         });
     }
+#endif
     public void IsNightEnable(bool isNightEnabled)
     {
         NightEnable.text = isNightEnabled.ToString();
-        StartCoroutine(AndroidToken(isfcmEnabled, isNightEnabled));
+        FcmEnable.text = isfcmEnabled.ToString();
+        ChangeToken(isfcmEnabled, isNightEnabled);
         isnightEnabled = isNightEnabled;
     }
+
+
+
     public void ISFCMEnable(bool isEnabled)
     {
+        NightEnable.text = isnightEnabled.ToString();
         FcmEnable.text = isEnabled.ToString();
-        StartCoroutine(AndroidToken(isEnabled, isnightEnabled));
+        ChangeToken(isEnabled, isnightEnabled);
         isfcmEnabled = isEnabled;
 
     }
+#if UNITY_IOS
+    void SaveToken(string token, bool isEnabled, bool isNightEnabled)
+    {
+        plugin.PushNotification.Save(token, isEnabled, isNightEnabled, (status, error, jsonString, values) =>
+        {
+            if (status.Equals(Configure.PN_API_STATE_SUCCESS))
+            {
+                Debug.Log("Success");
+            }
+            else
+            {
+                Debug.Log("Fail");
+            }
+        });
+    }
+
+    public void ChangeToken(bool isEnabled, bool isNightEnabled)
+    {
+        plugin.PushNotification.Change(isEnabled, isNightEnabled, (status, errorCode, jsonString, values) => {
+            if (status.Equals(Configure.PN_API_STATE_SUCCESS))
+            {
+                Debug.Log("Success");
+            }
+            else
+            {
+                Debug.Log("Fail");
+            }
+        });
+    }
+
+
 #endif
     /*public void ToKenOn()
     {
