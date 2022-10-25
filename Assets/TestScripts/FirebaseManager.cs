@@ -18,9 +18,33 @@ public class FirebaseManager : MonoBehaviour
     void Start()
     {
         plugin = Plugin.GetInstance();
-        //FirebaseAnalytics.SetAnalyticsCollectionEnabled(true); //局澄府平胶 力绢
+        //FirebaseAnalytics.SetAnalyticsCollectionEnabled(true); //?????????? ????
+        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
+        {
+            if (task.Result == DependencyStatus.Available)
+            {
+                Firebase.Messaging.FirebaseMessaging.TokenReceived += OnTokenReceived;
+                //Firebase.Messaging.FirebaseMessaging.MessageReceived += OnMessageReceived;
+
+
+                //LogEvent("test");
+                //LogEvent("param_test_int", "IntParam", 111);
+                //LogEvent("param_test_float", "FloatParam", 2.11f);
+                //LogEvent("param_test_string", "StringParam", "TEST");
+                //LogEvent("param_test_array",
+                //    new Parameter(FirebaseAnalytics.ParameterCharacter, "warrior"),
+                //    new Parameter(FirebaseAnalytics.ParameterLevel, 5));
+
+            }
+            else
+            {
+                Debug.LogError("Could not resolve all: " + task.Result);
+                Debug.LogError("Could not resolve all Firebase dependencies: " + task.Result);
+            }
+        });
 
     }
+#if UNITY_ANDROID
     IEnumerator AndroidToken(bool isEnabled, bool isNightEnabled)
     {
         var task = Firebase.Messaging.FirebaseMessaging.GetTokenAsync();
@@ -54,17 +78,9 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(AndroidToken(isEnabled, isnightEnabled));
         isfcmEnabled = isEnabled;
 
-        //FirebaseMessaging.TokenRegistrationOnInitEnabled = isEnabled;
-        //if (isEnabled)
-        //{
-        //    Debug.Log("Token Yes");
-        //}
-        //else
-        //{
-        //    Debug.Log("Token NO");
-        //}
     }
-    public void ToKenOn()
+#endif
+    /*public void ToKenOn()
     {
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
@@ -79,37 +95,8 @@ public class FirebaseManager : MonoBehaviour
                 Debug.LogError("Could not resolve all Firebase dependencies: " + task.Result);
             }
         });
-    }
+    }*/
 
-    
-
-    //private void Start()
-    //{
-
-    //    FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
-    //    {
-    //        if (task.Result == DependencyStatus.Available)
-    //        {
-    //            Firebase.Messaging.FirebaseMessaging.TokenReceived += OnTokenReceived;
-    //            //Firebase.Messaging.FirebaseMessaging.MessageReceived += OnMessageReceived;
-
-
-    //            LogEvent("test");
-    //            LogEvent("param_test_int", "IntParam", 111);
-    //            LogEvent("param_test_float", "FloatParam", 2.11f);
-    //            LogEvent("param_test_string", "StringParam", "TEST");
-    //            LogEvent("param_test_array",
-    //                new Parameter(FirebaseAnalytics.ParameterCharacter, "warrior"),
-    //                new Parameter(FirebaseAnalytics.ParameterLevel, 5));
-
-    //        }
-    //        else
-    //        {
-    //            Debug.LogError("Could not resolve all: " + task.Result);
-    //            Debug.LogError("Could not resolve all Firebase dependencies: " + task.Result);
-    //        }
-    //    });
-    //}
     public void OnTokenReceived(object sender, Firebase.Messaging.TokenReceivedEventArgs token)
     {
         UnityEngine.Debug.Log("Received Registration Token: " + token.Token);

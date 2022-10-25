@@ -33,8 +33,13 @@ public class AdmobManager : MonoBehaviour
     {
         return new AdRequest.Builder().Build();
     }
-    const string rewardTestID = "ca-app-pub-3940256099942544/5224354917"; 
-    const string rewardID = ""; 
+    const string rewardTestID = "ca-app-pub-3940256099942544/5224354917";
+#if UNITY_ANDROID
+    const string rewardID = "";
+#endif
+#if UNITY_IOS
+    const string rewardID = "";
+#endif
     RewardedAd rewardAd;
 
 
@@ -44,7 +49,7 @@ public class AdmobManager : MonoBehaviour
         rewardAd.LoadAd(GetAdRequest());
         rewardAd.OnUserEarnedReward += (sender, e) =>
         {
-            LogText.text = "리워드 광고 성공";
+            LogText.text = "?????? ???? ????";
         };
     }
 

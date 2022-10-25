@@ -5,9 +5,19 @@ using System.Threading.Tasks;
 using Google;
 using PlayNANOO;
 using Facebook.Unity;
+#if UNITY_IOS
+using System.Text;
+using AppleAuth;
+using AppleAuth.Native;
+using AppleAuth.Enums;
+using AppleAuth.Extensions;
+using AppleAuth.Interfaces;
+#endif
 
 public class PlayNAOOLogin : MonoBehaviour
 {
+    IAppleAuthManager _appleAuthManager;
+
     Plugin plugin;
     GoogleSignInConfiguration googleSignInConfiguration;
 
@@ -28,7 +38,22 @@ public class PlayNAOOLogin : MonoBehaviour
         {
             FB.ActivateApp();
         }
+#if UNITY_IOS
+        if (AppleAuthManager.IsCurrentPlatformSupported)
+        {
+            var deserializer = new PayloadDeserializer();
+            _appleAuthManager = new AppleAuthManager(deserializer);
+        }
+#endif
     }
+#if UNITY_IOS
+    private void Update()
+    {
+        _appleAuthManager?.Update();
+    }
+#endif
+
+
     #region FacebookLogin
     void OnFBInitComplete()
     {
@@ -104,9 +129,9 @@ public class PlayNAOOLogin : MonoBehaviour
             Debug.Log("Login Cancel");
         }
     }
-    #endregion
+#endregion
 
-    #region GoogleLogin
+#region GoogleLogin
     public void SignIn()
     {
         GoogleSignIn.Configuration = googleSignInConfiguration;
@@ -190,9 +215,9 @@ public class PlayNAOOLogin : MonoBehaviour
         });
         Debug.Log("Login Called");
     }
-    #endregion
+#endregion
 
-    #region TokenLogin
+#region TokenLogin
     public void TokenLogin()
     {
         plugin.AccountTokenSignIn((status, errorCode, jsonString, values) => {
@@ -231,9 +256,9 @@ public class PlayNAOOLogin : MonoBehaviour
             }
         });
     }
-    #endregion
+#endregion
 
-    #region TokenOut
+#region TokenOut
     public void TokenLogOut()
     {
         plugin.AccountTokenSignOut((status, errorCode, jsonString, values) => {
@@ -248,11 +273,12 @@ public class PlayNAOOLogin : MonoBehaviour
             }
         });
     }
-    #endregion
+#endregion
 
-    #region AppleLogin
+#region AppleLogin
     public void AppleSignIn()
     {
+#if UNITY_ANDROID
         plugin.OpenAppleID((status, errorCode, jsonString, values) =>
         {
             if (status == Configure.PN_API_STATE_SUCCESS)
@@ -285,8 +311,61 @@ public class PlayNAOOLogin : MonoBehaviour
                 }
             }
         });
+#endif
+#if UNITY_IOS
+        var loginArgs = new AppleAuthLoginArgs();
+
+        this._appleAuthManager.LoginWithAppleId(
+            loginArgs,
+            credential =>
+            {
+                var appleIdCredential = credential as IAppleIDCredential;
+                if (appleIdCredential != null)
+                {
+                    string idToken = Encoding.UTF8.GetString(appleIdCredential.IdentityToken, 0, appleIdCredential.IdentityToken.Length);
+                    plugin.AccountSocialSignIn(idToken, Configure.PN_ACCOUNT_APPLE_ID, (status, errorCode, jsonString, values) =>
+                    {
+                        if (status == Configure.PN_API_STATE_SUCCESS)
+                        {
+                            Debug.Log(values["access_token"].ToString());
+                            Debug.Log(values["refresh_token"].ToString());
+                            Debug.Log(values["uuid"].ToString());
+                            Debug.Log(values["openID"].ToString());
+                            Debug.Log(values["nickname"].ToString());
+                            Debug.Log(values["linkedID"].ToString());
+                            Debug.Log(values["linkedType"].ToString());
+                            Debug.Log(values["country"].ToString());
+                        }
+                        else
+                        {
+                            if (values != null)
+                            {
+                                if (values["ErrorCode"].ToString() == "30007")
+                                {
+                                    Debug.Log(values["WithdrawalKey"].ToString());
+                                }
+                                else
+                                {
+                                    Debug.Log("Fail");
+                                }
+                            }
+                            else
+                            {
+                                Debug.Log("Fail");
+                            }
+                        }
+                    });
+                }
+            },
+            error =>
+            {
+                // Something went wrong
+                var authorizationErrorCode = error.GetAuthorizationErrorCode();
+            }
+            );
+#endif
     }
-    #endregion
+#endregion
 
     #region TokenRefresh
     public void TokenRefresh()
@@ -324,6 +403,6 @@ public class PlayNAOOLogin : MonoBehaviour
             }
         });
     }
-    #endregion
+#endregion
 }
 
