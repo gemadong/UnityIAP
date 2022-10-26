@@ -1,6 +1,8 @@
 fileFormatVersion: 2
-guid: 2ba035f933dc58844963df0adda9379b
-folderAsset: yes
+guid: e1a3ff77f802d43818521ff3db2bf944
+labels:
+- gvh
+- gvh_version-1.0.4
 DefaultImporter:
   externalObjects: {}
   userData: 
