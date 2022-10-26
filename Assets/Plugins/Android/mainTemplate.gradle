@@ -18,6 +18,9 @@
             url "https://android-sdk.is.com/" // Assets/GoogleMobileAds/Editor/IronSourceMediationDependencies.xml:8
         }
         maven {
+            url (unityProjectPath + "/Assets/GeneratedLocalRepo/GoogleSignIn/Editor/m2repository") // Assets/GoogleSignIn/Editor/GoogleSignInSupportDependencies.xml:9
+        }
+        maven {
             url "https://dl.google.com/dl/android/maven2/" // Assets/GoogleMobileAds/Editor/AdColonyMediationDependencies.xml:8, Assets/GoogleMobileAds/Editor/AppLovinMediationDependencies.xml:8, Assets/GoogleMobileAds/Editor/IronSourceMediationDependencies.xml:8, Assets/GoogleMobileAds/Editor/MetaAudienceNetworkMediationDependencies.xml:8, Assets/GoogleMobileAds/Editor/UnityMediationDependencies.xml:9
         }
         mavenLocal()
@@ -60,6 +63,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-iid:21.1.0' // Assets/Firebase/Editor/MessagingDependencies.xml:17
     implementation 'com.google.firebase:firebase-messaging:23.0.8' // Assets/Firebase/Editor/MessagingDependencies.xml:13
     implementation 'com.google.firebase:firebase-messaging-unity:9.5.0' // Assets/Firebase/Editor/MessagingDependencies.xml:22
+    implementation 'com.google.signin:google-signin-support:1.0.4' // Assets/GoogleSignIn/Editor/GoogleSignInSupportDependencies.xml:9
     implementation 'com.parse.bolts:bolts-android:1.4.0' // Assets/FacebookSDK/Plugins/Editor/Dependencies.xml:4
     implementation 'com.unity3d.ads:unity-ads:4.4.0' // Assets/GoogleMobileAds/Editor/UnityMediationDependencies.xml:17
 // Android Resolver Dependencies End
