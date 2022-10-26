@@ -16,10 +16,13 @@ using AppleAuth.Interfaces;
 
 public class PlayNAOOLogin : MonoBehaviour
 {
+#if UNITY_IOS
     IAppleAuthManager _appleAuthManager;
-
+#endif
     Plugin plugin;
     GoogleSignInConfiguration googleSignInConfiguration;
+    bool googleIsLogin = false;
+
 
     void Start()
     {
@@ -179,12 +182,12 @@ public class PlayNAOOLogin : MonoBehaviour
     }
     private void Login(string token)
     {
-        Debug.Log("Login Started");
         plugin.AccountSocialSignIn(token, Configure.PN_ACCOUNT_GOOGLE, (status, errorCode, jsonString, values) =>
         {
             Debug.Log("Login Status : " + status);
             if (status == Configure.PN_API_STATE_SUCCESS)
             {
+                googleIsLogin = true;
                 Debug.Log(values["access_token"].ToString());
                 Debug.Log(values["refresh_token"].ToString());
                 Debug.Log(values["uuid"].ToString());
@@ -213,7 +216,6 @@ public class PlayNAOOLogin : MonoBehaviour
                 }
             }
         });
-        Debug.Log("Login Called");
     }
 #endregion
 
@@ -265,7 +267,11 @@ public class PlayNAOOLogin : MonoBehaviour
             if (status.Equals(Configure.PN_API_STATE_SUCCESS))
             {
                 Debug.Log(values["status"].ToString());
-                GoogleSignIn.DefaultInstance.SignOut();
+                if (googleIsLogin) 
+                { 
+                    GoogleSignIn.DefaultInstance.SignOut();
+                    googleIsLogin = false;
+                }
             }
             else
             {

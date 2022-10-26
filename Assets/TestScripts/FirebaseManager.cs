@@ -27,7 +27,7 @@ public class FirebaseManager : MonoBehaviour
             if (task.Result == DependencyStatus.Available)
             {
                 Firebase.Messaging.FirebaseMessaging.TokenReceived += OnTokenReceived;
-                //Firebase.Messaging.FirebaseMessaging.MessageReceived += OnMessageReceived;
+                Firebase.Messaging.FirebaseMessaging.MessageReceived += OnMessageReceived;
 
 
                 //LogEvent("test");
@@ -50,7 +50,7 @@ public class FirebaseManager : MonoBehaviour
         NotificationServices.RegisterForNotifications(NotificationType.Alert | NotificationType.Badge | NotificationType.Sound, true);
         byte[] token = NotificationServices.deviceToken;
         Debug.Log("token :" + token);
-        if (token != null) SaveToken(System.BitConverter.ToString(token).Replace("-", ""), true, true);
+        if (token != null) SaveToken(System.BitConverter.ToString(token).Replace("-", ""), isnightEnabled, isfcmEnabled);
 #endif
     }
 #if UNITY_ANDROID
@@ -97,6 +97,7 @@ public class FirebaseManager : MonoBehaviour
 #if UNITY_IOS
     void SaveToken(string token, bool isEnabled, bool isNightEnabled)
     {
+        Debug.Log("SaveToken Start!!!");
         plugin.PushNotification.Save(token, isEnabled, isNightEnabled, (status, error, jsonString, values) =>
         {
             if (status.Equals(Configure.PN_API_STATE_SUCCESS))
@@ -108,7 +109,9 @@ public class FirebaseManager : MonoBehaviour
                 Debug.Log("Fail");
             }
         });
+        Debug.Log("SaveToken End!!!");
     }
+#endif
 
     public void ChangeToken(bool isEnabled, bool isNightEnabled)
     {
@@ -125,7 +128,6 @@ public class FirebaseManager : MonoBehaviour
     }
 
 
-#endif
     /*public void ToKenOn()
     {
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
