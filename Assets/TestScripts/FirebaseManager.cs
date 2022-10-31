@@ -7,8 +7,10 @@ using Firebase.Messaging;
 using Firebase.Analytics;
 using PlayNANOO;
 #if UNITY_IOS
+using Unity.Notifications.iOS;
 using NotificationServices = UnityEngine.iOS.NotificationServices;
 using NotificationType = UnityEngine.iOS.NotificationType;
+
 #endif
 
 public class FirebaseManager : MonoBehaviour
@@ -45,12 +47,9 @@ public class FirebaseManager : MonoBehaviour
                 Debug.LogError("Could not resolve all Firebase dependencies: " + task.Result);
             }
         });
-
 #if UNITY_IOS
-        NotificationServices.RegisterForNotifications(NotificationType.Alert | NotificationType.Badge | NotificationType.Sound, true);
-        byte[] token = NotificationServices.deviceToken;
-        Debug.Log("token :" + token);
-        if (token != null) SaveToken(System.BitConverter.ToString(token).Replace("-", ""), isnightEnabled, isfcmEnabled);
+        //NotificationServices.RegisterForNotifications(NotificationType.Alert | NotificationType.Badge | NotificationType.Sound, true);
+        //IOSToken();
 #endif
     }
 #if UNITY_ANDROID
@@ -84,7 +83,7 @@ public class FirebaseManager : MonoBehaviour
         isnightEnabled = isNightEnabled;
     }
 
-
+    
 
     public void ISFCMEnable(bool isEnabled)
     {
@@ -95,14 +94,53 @@ public class FirebaseManager : MonoBehaviour
 
     }
 #if UNITY_IOS
+    string deviceToken;
+    IEnumerator RequestAuthorization()
+    {
+        Debug.Log("Start Coroutine!!!");
+        var authorizationOption = AuthorizationOption.Alert | AuthorizationOption.Badge;
+        using (var req = new AuthorizationRequest(authorizationOption, true))
+        {
+            while (!req.IsFinished)
+            {
+                yield return null;
+            };
+
+            string res = "\n RequestAuthorization:";
+            res += "\n finished: " + req.IsFinished;
+            res += "\n granted :  " + req.Granted;
+            res += "\n error:  " + req.Error;
+            res += "\n deviceToken:  " + req.DeviceToken;
+            deviceToken = req.DeviceToken;
+            Debug.Log("finished : " + req.IsFinished);
+            Debug.Log("granted : " + req.Granted);
+            Debug.Log("error : " + req.Error);
+            Debug.Log("deviceToken  : " + deviceToken);
+            IOSToken(deviceToken);
+        }
+    }
+
+    public void TokenSaveIOS()
+    {
+        NotificationServices.RegisterForNotifications(NotificationType.Alert | NotificationType.Badge | NotificationType.Sound, true);
+        StartCoroutine(RequestAuthorization());
+        
+    }
+    void IOSToken(string deviceToken)
+    {
+        Debug.Log("IOS Token Click");
+        SaveToken(deviceToken, isfcmEnabled, isnightEnabled);
+    }
     void SaveToken(string token, bool isEnabled, bool isNightEnabled)
     {
         Debug.Log("SaveToken Start!!!");
-        plugin.PushNotification.Save(token, isEnabled, isNightEnabled, (status, error, jsonString, values) =>
+        Debug.Log("isFCMEnable :" + isEnabled);
+        Debug.Log("isNightEnabled : " + isNightEnabled);
+        plugin.PushNotification.Save(token, true, true, (status, error, jsonString, values) =>
         {
             if (status.Equals(Configure.PN_API_STATE_SUCCESS))
             {
-                Debug.Log("Success");
+                Debug.Log("Success Good!!!");
             }
             else
             {
