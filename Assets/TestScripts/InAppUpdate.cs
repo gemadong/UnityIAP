@@ -8,16 +8,48 @@ using Google.Play.Common;
 
 public class InAppUpdate : MonoBehaviour
 {
-
+    [SerializeField] private GameObject _updateWindow;
 #if UNITY_ANDROID
-    public void UpdateTest()
+    private void Start()
     {
         StartCoroutine(CheckForUpdate());
     }
 
     public IEnumerator CheckForUpdate()
     {
+        AppUpdateManager appUpdateManager = new AppUpdateManager();
+        PlayAsyncOperation<AppUpdateInfo, AppUpdateErrorCode> appUpdateInfoOperation =
+          appUpdateManager.GetAppUpdateInfo();
 
+        // Wait until the asynchronous operation completes.
+        yield return appUpdateInfoOperation;
+        if (appUpdateInfoOperation.IsSuccessful)
+        {
+            var appUpdateInfoResult = appUpdateInfoOperation.GetResult();
+
+            if (appUpdateInfoResult.UpdateAvailability == UpdateAvailability.UpdateAvailable)
+            {
+                _updateWindow.SetActive(true);
+            }
+            else
+            {
+                Debug.Log("NO Update");
+            }
+
+        }
+        else
+        {
+            Debug.Log("NO Update");
+        }
+    }
+    public void UpdateTest()
+    {
+        StartCoroutine(StartUpdateWindow());
+    }
+
+    public IEnumerator StartUpdateWindow()
+    {
+        _updateWindow.SetActive(false);
         AppUpdateManager appUpdateManager = new AppUpdateManager();
         PlayAsyncOperation<AppUpdateInfo, AppUpdateErrorCode> appUpdateInfoOperation =
           appUpdateManager.GetAppUpdateInfo();

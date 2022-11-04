@@ -1,45 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using Firebase;
 using Firebase.Messaging;
-using Firebase.Analytics;
 using PlayNANOO;
 #if UNITY_IOS
 using Unity.Notifications.iOS;
 using NotificationServices = UnityEngine.iOS.NotificationServices;
 using NotificationType = UnityEngine.iOS.NotificationType;
-
 #endif
 
-public class FirebaseManager : MonoBehaviour
+public class PushMessaging : MonoBehaviour
 {
-    [SerializeField] private Text FcmEnable;
-    [SerializeField] private Text NightEnable;
     Plugin plugin;
-    bool isnightEnabled = true;
-    bool isfcmEnabled = true;
+    public bool isnightEnabled = true;
+    public bool isfcmEnabled = true;
     void Start()
     {
         plugin = Plugin.GetInstance();
-        //FirebaseAnalytics.SetAnalyticsCollectionEnabled(true); //?????????? ????
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
             if (task.Result == DependencyStatus.Available)
             {
-                Firebase.Messaging.FirebaseMessaging.TokenReceived += OnTokenReceived;
-                Firebase.Messaging.FirebaseMessaging.MessageReceived += OnMessageReceived;
-
-
-                //LogEvent("test");
-                //LogEvent("param_test_int", "IntParam", 111);
-                //LogEvent("param_test_float", "FloatParam", 2.11f);
-                //LogEvent("param_test_string", "StringParam", "TEST");
-                //LogEvent("param_test_array",
-                //    new Parameter(FirebaseAnalytics.ParameterCharacter, "warrior"),
-                //    new Parameter(FirebaseAnalytics.ParameterLevel, 5));
-
+                FirebaseMessaging.TokenReceived += OnTokenReceived;
+                FirebaseMessaging.MessageReceived += OnMessageReceived;
             }
             else
             {
@@ -52,21 +36,28 @@ public class FirebaseManager : MonoBehaviour
         //IOSToken();
 #endif
     }
+
 #if UNITY_ANDROID
+    public void StartSaveToken()
+    {
+        StartCoroutine(AndroidToken(isnightEnabled, isfcmEnabled));
+    }
+
     IEnumerator AndroidToken(bool isEnabled, bool isNightEnabled)
     {
-        var task = Firebase.Messaging.FirebaseMessaging.GetTokenAsync();
+        var task = FirebaseMessaging.GetTokenAsync();
         while (!task.IsCompleted) yield return new WaitForEndOfFrame();
 
-        SaveToken(task.Result,isEnabled, isNightEnabled);
+        SaveToken(task.Result, isEnabled, isNightEnabled);
     }
+
     void SaveToken(string token, bool isEnabled, bool isNightEnabled)
     {
-        plugin.PushNotification.Save(token , isEnabled, isNightEnabled, (status, error, jsonString, values) =>
+        plugin.PushNotification.Save(token, isEnabled, isNightEnabled, (status, error, jsonString, values) =>
         {
             if (status.Equals(Configure.PN_API_STATE_SUCCESS))
             {
-                Debug.Log("Success");
+                Debug.Log("SaveToken Success !!");
             }
             else
             {
@@ -75,24 +66,6 @@ public class FirebaseManager : MonoBehaviour
         });
     }
 #endif
-    public void IsNightEnable(bool isNightEnabled)
-    {
-        NightEnable.text = isNightEnabled.ToString();
-        FcmEnable.text = isfcmEnabled.ToString();
-        ChangeToken(isfcmEnabled, isNightEnabled);
-        isnightEnabled = isNightEnabled;
-    }
-
-    
-
-    public void ISFCMEnable(bool isEnabled)
-    {
-        NightEnable.text = isnightEnabled.ToString();
-        FcmEnable.text = isEnabled.ToString();
-        ChangeToken(isEnabled, isnightEnabled);
-        isfcmEnabled = isEnabled;
-
-    }
 #if UNITY_IOS
     string deviceToken;
     IEnumerator RequestAuthorization()
@@ -112,10 +85,6 @@ public class FirebaseManager : MonoBehaviour
             res += "\n error:  " + req.Error;
             res += "\n deviceToken:  " + req.DeviceToken;
             deviceToken = req.DeviceToken;
-            Debug.Log("finished : " + req.IsFinished);
-            Debug.Log("granted : " + req.Granted);
-            Debug.Log("error : " + req.Error);
-            Debug.Log("deviceToken  : " + deviceToken);
             IOSToken(deviceToken);
         }
     }
@@ -164,55 +133,29 @@ public class FirebaseManager : MonoBehaviour
             }
         });
     }
-
-
-    /*public void ToKenOn()
+    
+    public void IsNightEnable(bool isNightEnabled)
     {
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
-        {
-            if (task.Result == DependencyStatus.Available)
-            {
-                FirebaseMessaging.TokenReceived += OnTokenReceived;
-                FirebaseMessaging.MessageReceived += OnMessageReceived;
-            }
-            else
-            {
-                Debug.LogError("Could not resolve all: " + task.Result);
-                Debug.LogError("Could not resolve all Firebase dependencies: " + task.Result);
-            }
-        });
-    }*/
-
-    public void OnTokenReceived(object sender, Firebase.Messaging.TokenReceivedEventArgs token)
-    {
-        UnityEngine.Debug.Log("Received Registration Token: " + token.Token);
-    }
-
-    public void OnMessageReceived(object sender, Firebase.Messaging.MessageReceivedEventArgs e)
-    {
-        UnityEngine.Debug.Log("Received a new message from: " + e.Message.From);
+        ChangeToken(isfcmEnabled, isNightEnabled);
+        isnightEnabled = isNightEnabled;
     }
 
 
-    public void LogEvent(string eventName)
+
+    public void ISFCMEnable(bool isEnabled)
     {
-        FirebaseAnalytics.LogEvent(eventName);
+        ChangeToken(isEnabled, isnightEnabled);
+        isfcmEnabled = isEnabled;
+
     }
-    public void LogEvent(string eventName, string paramName, int paramValue)
+
+    public void OnTokenReceived(object sender,TokenReceivedEventArgs token)
     {
-        FirebaseAnalytics.LogEvent(eventName, paramName, paramValue);
+        Debug.Log("Received Registration Token: " + token.Token);
     }
-    public void LogEvent(string eventName, string paramName, float paramValue)
+
+    public void OnMessageReceived(object sender,MessageReceivedEventArgs e)
     {
-        FirebaseAnalytics.LogEvent(eventName, paramName, paramValue);
+        Debug.Log("Received a new message from: " + e.Message.From);
     }
-    public void LogEvent(string eventName, string paramName, string paramValue)
-    {
-        FirebaseAnalytics.LogEvent(eventName, paramName, paramValue);
-    }
-    public void LogEvent(string eventName, params Parameter[] paramArray)
-    {
-        FirebaseAnalytics.LogEvent(eventName, paramArray);
-    }
-   
 }

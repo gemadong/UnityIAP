@@ -108,7 +108,7 @@
         "Behavior": 0
     },
     "m_FilterOptions": {
-        "m_Filter": "sig",
+        "m_Filter": "",
         "m_UseRegularExpressions": false,
         "m_MatchCase": false
     },

@@ -14,15 +14,24 @@ using AppleAuth.Extensions;
 using AppleAuth.Interfaces;
 #endif
 
-public class PlayNAOOLogin : MonoBehaviour
+public class PlayNANOOLogin : MonoBehaviour
 {
-#if UNITY_IOS
-    IAppleAuthManager _appleAuthManager;
-#endif
-    Plugin plugin;
+    [SerializeField] private GameObject _loginButton;
+    [SerializeField] private GameObject _tapToStartButton;
+
     GoogleSignInConfiguration googleSignInConfiguration;
+    Plugin plugin;
+
     bool googleIsLogin = false;
 
+#if UNITY_IOS
+    IAppleAuthManager _appleAuthManager;
+
+    private void Update()
+    {
+        _appleAuthManager?.Update();
+    }
+#endif
 
     void Start()
     {
@@ -41,6 +50,11 @@ public class PlayNAOOLogin : MonoBehaviour
         {
             FB.ActivateApp();
         }
+        if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 1)
+        {
+            TokenLogin();
+        }
+
 #if UNITY_IOS
         if (AppleAuthManager.IsCurrentPlatformSupported)
         {
@@ -49,13 +63,10 @@ public class PlayNAOOLogin : MonoBehaviour
         }
 #endif
     }
-#if UNITY_IOS
-    private void Update()
+    public void TapToStartButton()
     {
-        _appleAuthManager?.Update();
+        Debug.Log("메인씬으로 넘어감!!");
     }
-#endif
-
 
 #region FacebookLogin
     void OnFBInitComplete()
@@ -106,6 +117,7 @@ public class PlayNAOOLogin : MonoBehaviour
                     Debug.Log(values["linkedID"].ToString());
                     Debug.Log(values["linkedType"].ToString());
                     Debug.Log(values["country"].ToString());
+                    _loginButton.SetActive(false);
                 }
                 else
                 {
@@ -196,6 +208,7 @@ public class PlayNAOOLogin : MonoBehaviour
                 Debug.Log(values["linkedID"].ToString());
                 Debug.Log(values["linkedType"].ToString());
                 Debug.Log(values["country"].ToString());
+                _loginButton.SetActive(false);
             }
             else
             {
@@ -214,68 +227,6 @@ public class PlayNAOOLogin : MonoBehaviour
                 {
                     Debug.Log("Fail");
                 }
-            }
-        });
-    }
-#endregion
-
-#region TokenLogin
-    public void TokenLogin()
-    {
-        plugin.AccountTokenSignIn((status, errorCode, jsonString, values) => {
-            if (status.Equals(Configure.PN_API_STATE_SUCCESS))
-            {
-                Debug.Log(values["access_token"].ToString());
-                Debug.Log(values["refresh_token"].ToString());
-                Debug.Log(values["uuid"].ToString());
-                Debug.Log(values["openID"].ToString());
-                Debug.Log(values["nickname"].ToString());
-                Debug.Log(values["linkedID"].ToString());
-                Debug.Log(values["linkedType"].ToString());
-                Debug.Log(values["country"].ToString());
-            }
-            else
-            {
-                if (values != null)
-                {
-                    if (values["ErrorCode"].ToString() == "30007")
-                    {
-                        Debug.Log(values["WithdrawalKey"].ToString());
-                    }
-                    else if(values["ErrorCode"].ToString() == "30002")
-                    {
-                        TokenRefresh();
-                    }
-                    else
-                    {
-                        Debug.Log("Fail");
-                    }
-                }
-                else
-                {
-                    Debug.Log("Fail");
-                }
-            }
-        });
-    }
-#endregion
-
-#region TokenOut
-    public void TokenLogOut()
-    {
-        plugin.AccountTokenSignOut((status, errorCode, jsonString, values) => {
-            if (status.Equals(Configure.PN_API_STATE_SUCCESS))
-            {
-                Debug.Log(values["status"].ToString());
-                if (googleIsLogin) 
-                { 
-                    GoogleSignIn.DefaultInstance.SignOut();
-                    googleIsLogin = false;
-                }
-            }
-            else
-            {
-                Debug.Log("Fail");
             }
         });
     }
@@ -297,6 +248,7 @@ public class PlayNAOOLogin : MonoBehaviour
                 Debug.Log(values["linkedID"].ToString());
                 Debug.Log(values["linkedType"].ToString());
                 Debug.Log(values["country"].ToString());
+                _loginButton.SetActive(false);
             }
             else
             {
@@ -371,6 +323,72 @@ public class PlayNAOOLogin : MonoBehaviour
             );
 #endif
     }
+
+
+#endregion
+
+#region TokenLogin
+    public void TokenLogin()
+    {
+        plugin.AccountTokenSignIn((status, errorCode, jsonString, values) => {
+            if (status.Equals(Configure.PN_API_STATE_SUCCESS))
+            {
+                Debug.Log(values["access_token"].ToString());
+                Debug.Log(values["refresh_token"].ToString());
+                Debug.Log(values["uuid"].ToString());
+                Debug.Log(values["openID"].ToString());
+                Debug.Log(values["nickname"].ToString());
+                Debug.Log(values["linkedID"].ToString());
+                Debug.Log(values["linkedType"].ToString());
+                Debug.Log(values["country"].ToString());
+                _tapToStartButton.SetActive(true);
+            }
+            else
+            {
+                if (values != null)
+                {
+                    if (values["ErrorCode"].ToString() == "30007")
+                    {
+                        Debug.Log(values["WithdrawalKey"].ToString());
+                    }
+                    else if(values["ErrorCode"].ToString() == "30002")
+                    {
+                        TokenRefresh();
+                    }
+                    else
+                    {
+                        Debug.Log("Fail");
+                    }
+                }
+                else
+                {
+                    Debug.Log("Fail");
+                }
+                _loginButton.SetActive(true);
+            }
+        });
+    }
+#endregion
+
+#region TokenOut
+    public void TokenLogOut()
+    {
+        plugin.AccountTokenSignOut((status, errorCode, jsonString, values) => {
+            if (status.Equals(Configure.PN_API_STATE_SUCCESS))
+            {
+                Debug.Log(values["status"].ToString());
+                if (googleIsLogin) 
+                { 
+                    GoogleSignIn.DefaultInstance.SignOut();
+                    googleIsLogin = false;
+                }
+            }
+            else
+            {
+                Debug.Log("Fail");
+            }
+        });
+    }
 #endregion
 
 #region TokenRefresh
@@ -409,6 +427,7 @@ public class PlayNAOOLogin : MonoBehaviour
             }
         });
     }
-#endregion
+    #endregion
+
 }
 
