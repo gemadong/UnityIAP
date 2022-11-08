@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.unity.ads.ios-support": "file:/Users/james/Downloads/com.unity.ads.ios-support-master/com.unity.ads.ios-support",
     "com.unity.collab-proxy": "1.17.6",
     "com.unity.feature.development": "1.0.1",
     "com.unity.ide.rider": "3.0.15",

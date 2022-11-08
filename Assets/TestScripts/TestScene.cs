@@ -26,6 +26,7 @@ using AppleAuth.Interfaces;
 using Unity.Notifications.iOS;
 using NotificationServices = UnityEngine.iOS.NotificationServices;
 using NotificationType = UnityEngine.iOS.NotificationType;
+using Unity.Advertisement.IosSupport;
 #endif
 
 public class TestScene : MonoBehaviour
@@ -60,6 +61,17 @@ public class TestScene : MonoBehaviour
 #if UNITY_IOS
     IAppleAuthManager _appleAuthManager;
 #endif
+    void Awake()
+    {
+#if UNITY_IOS
+        // Check the user's consent status.
+        // If the status is undetermined, display the request request:
+        if (ATTrackingStatusBinding.GetAuthorizationTrackingStatus() == ATTrackingStatusBinding.AuthorizationTrackingStatus.NOT_DETERMINED)
+        {
+            ATTrackingStatusBinding.RequestAuthorizationTracking();
+        }
+#endif
+    }
     private void Start()
     {
         //PlayNANOO
