@@ -10,6 +10,7 @@ using Firebase;
 using Firebase.Analytics;
 using Firebase.Messaging;
 using CodeStage.AntiCheat.Genuine.CodeHash;
+using System.IO;
 using TMPro;
 #if UNITY_ANDROID
 using Google.Play.AppUpdate;
@@ -78,7 +79,7 @@ public class TestScene : MonoBehaviour
                 Debug.LogError("Could not resolve all Firebase dependencies: " + task.Result);
             }
         });
-        RemoteConfigGet();
+        CheckIfDeviceIsRooted();
 
     }
     
@@ -92,28 +93,100 @@ public class TestScene : MonoBehaviour
 
     public void TapToStartButton()
     {
-        Debug.Log("Game Start!!!");
+        testText.text = "Game Start!!!";
     }
 
-    #region HashCode
-    void HashCodeGeneration()
+    #region RemoteConfig
+    public static string GetData()
     {
-        if (!CodeHashGenerator.IsTargetPlatformCompatible()) return;
-        CodeHashGenerator.HashGenerated += OnGotHash;
-        CodeHashGenerator.Generate();
-    }
-    void OnGotHash(HashGeneratorResult result)
-    {
-        if (!result.Success) return;
-        if (remoteConfig._hashCode == result.CodeHash)
+        string result = "";
+
+        if (Application.platform == RuntimePlatform.Android)
         {
-            testText.text = "코드 같음";
-            AcceptTermsInstantiate();
+            var osBuild = new AndroidJavaClass("android.os.Build");
+            string brand = osBuild.GetStatic<string>("BRAND");
+            string fingerPrint = osBuild.GetStatic<string>("FINGERPRINT");
+            string model = osBuild.GetStatic<string>("MODEL");
+            string menufacturer = osBuild.GetStatic<string>("MANUFACTURER");
+            string device = osBuild.GetStatic<string>("DEVICE");
+            string product = osBuild.GetStatic<string>("PRODUCT");
+
+            result += Application.installerName;
+            result += "/";
+            result += Application.installMode.ToString();
+            result += "/";
+            result += Application.buildGUID;
+            result += "/";
+            result += "Genuine :" + Application.genuine;
+            result += "/";
+            result += "Rooted : " + isRooted();
+            result += "/";
+            result += "Model : " + model;
+            result += "/";
+            result += "Menufacturer : " + menufacturer;
+            result += "/";
+            result += "Device : " + device;
+            result += "/";
+            result += "Fingerprint : " + fingerPrint;
+            result += "/";
+            result += "Product : " + product;
         }
         else
         {
-            testText.text = "코드 다름";
+            result += Application.installerName;
+            result += "/";
+            result += Application.installMode.ToString();
+            result += "/";
+            result += Application.buildGUID;
+            result += "/";
+            result += "Genuine :" + Application.genuine;
+            result += "/";
         }
+        return result;
+    }
+    public static bool isRooted()
+    {
+        bool isRoot = false;
+
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            if (isRootedPrivate("/system/bin/su"))
+                isRoot = true;
+            if (isRootedPrivate("/system/xbin/su"))
+                isRoot = true;
+            if (isRootedPrivate("/system/app/SuperUser.apk"))
+                isRoot = true;
+            if (isRootedPrivate("/data/data/com.noshufou.android.su"))
+                isRoot = true;
+            if (isRootedPrivate("/sbin/su"))
+                isRoot = true;
+        }
+
+        return isRoot;
+    }
+    public static bool isRootedPrivate(string path)
+    {
+        bool boolTemp = false;
+
+        if (File.Exists(path))
+        {
+            boolTemp = true;
+        }
+
+        return boolTemp;
+    }
+    public void CheckIfDeviceIsRooted()
+    {
+        if (isRooted())
+        {
+            testText.text = "루트모드!";
+        }
+        else
+        {
+            testText.text = "루트 아님!";
+            RemoteConfigGet();
+        }
+
     }
     #endregion
 
@@ -139,6 +212,28 @@ public class TestScene : MonoBehaviour
             }
             else testText.text = "Json놉!";
         });
+    }
+    #endregion
+
+    #region HashCode
+    void HashCodeGeneration()
+    {
+        if (!CodeHashGenerator.IsTargetPlatformCompatible()) return;
+        CodeHashGenerator.HashGenerated += OnGotHash;
+        CodeHashGenerator.Generate();
+    }
+    void OnGotHash(HashGeneratorResult result)
+    {
+        if (!result.Success) return;
+        if (remoteConfig._hashCode == result.CodeHash)
+        {
+            testText.text = "코드 같음";
+            AcceptTermsInstantiate();
+        }
+        else
+        {
+            testText.text = "코드 다름";
+        }
     }
     #endregion
 
