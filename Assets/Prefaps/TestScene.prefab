@@ -51,4 +51,5 @@ MonoBehaviour:
   _loginGoogleButtonPrefeb: {fileID: 8837035251350245498, guid: 05d059d87bfc2f249befda5dda075122, type: 3}
   _loginFacebookButtonPrefeb: {fileID: 3363832640462980043, guid: d19e1b2b73bcb5440bd0af6b4f28e787, type: 3}
   _loginAppleButtonPrefeb: {fileID: 9081206969822750808, guid: 72a5aab3cfaedb2408f821bb2b19d9d3, type: 3}
+  testText: {fileID: 6871619841631426177, guid: 37a4f909f48e08d4797b401950b3b254, type: 3}
   _updateWindowPrefeb: {fileID: 3815924834050217827, guid: 79d310d4ceeb3a941a4c2768753f0b9a, type: 3}

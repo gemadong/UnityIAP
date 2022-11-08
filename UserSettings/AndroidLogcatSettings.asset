@@ -10,32 +10,32 @@
     "m_KnownPackagesForSerialization": [
         {
             "deviceId": "127.0.0.1:5555",
-            "name": "com.gemadong.unityiap",
-            "processId": 16364,
+            "name": "com.bluestacks.launcher",
+            "processId": 2340,
+            "exited": true
+        },
+        {
+            "deviceId": "127.0.0.1:5555",
+            "name": "com.dh.anticheat",
+            "processId": 12450,
+            "exited": true
+        },
+        {
+            "deviceId": "127.0.0.1:5555",
+            "name": "com.dh.anticheat",
+            "processId": 12777,
+            "exited": true
+        },
+        {
+            "deviceId": "127.0.0.1:5555",
+            "name": "com.dh.remoteconfigtest",
+            "processId": 13473,
             "exited": true
         },
         {
             "deviceId": "127.0.0.1:5555",
             "name": "com.gemadong.unityiap",
-            "processId": 12722,
-            "exited": true
-        },
-        {
-            "deviceId": "127.0.0.1:5555",
-            "name": "com.gemadong.unityiap",
-            "processId": 7310,
-            "exited": true
-        },
-        {
-            "deviceId": "127.0.0.1:5555",
-            "name": "com.AbleGames.DalToKi",
-            "processId": 14169,
-            "exited": true
-        },
-        {
-            "deviceId": "127.0.0.1:5555",
-            "name": "com.gemadong.unityiap",
-            "processId": 4198,
+            "processId": 4599,
             "exited": false
         },
         {
@@ -95,7 +95,7 @@
             },
             {
                 "m_Name": "No Filter",
-                "m_Selected": true
+                "m_Selected": false
             },
             {
                 "m_Name": "",
@@ -111,7 +111,7 @@
             },
             {
                 "m_Name": "Unity",
-                "m_Selected": false
+                "m_Selected": true
             },
             {
                 "m_Name": "CRASH",

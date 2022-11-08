@@ -9,9 +9,8 @@ using Facebook.Unity;
 using Firebase;
 using Firebase.Analytics;
 using Firebase.Messaging;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using CodeStage.AntiCheat.Genuine.CodeHash;
+using TMPro;
 #if UNITY_ANDROID
 using Google.Play.AppUpdate;
 using Google.Play.Common;
@@ -31,13 +30,13 @@ using NotificationType = UnityEngine.iOS.NotificationType;
 public class TestScene : MonoBehaviour
 {
     [SerializeField] private GameObject _canvas;
-    //[SerializeField] private GameObject _loadingCanvas;
     [SerializeField] private GameObject _acceptTermsWindowPrefeb;
     [SerializeField] private GameObject _inspectionWindowPrefeb;
     [SerializeField] private Button _tapToStartButton;
     [SerializeField] private Button _loginGoogleButtonPrefeb;
     [SerializeField] private Button _loginFacebookButtonPrefeb;
     [SerializeField] private Button _loginAppleButtonPrefeb;
+    [SerializeField] private TextMeshProUGUI testText;
 #if UNITY_ANDROID
     [SerializeField] private GameObject _updateWindowPrefeb;
 
@@ -50,8 +49,9 @@ public class TestScene : MonoBehaviour
     Button _startButton;
     Button _allAgreeButton;
 
-    GoogleSignInConfiguration googleSignInConfiguration;
     Plugin plugin;
+    GoogleSignInConfiguration googleSignInConfiguration;
+    RemoteConfig remoteConfig;
 
     bool googleIsLogin = false;
     bool isnightEnabled = true;
@@ -62,7 +62,6 @@ public class TestScene : MonoBehaviour
 #endif
     private void Start()
     {
-        //LoadingEnable(true);
         //PlayNANOO
         plugin = Plugin.GetInstance();
         //Firebase Push
@@ -79,11 +78,10 @@ public class TestScene : MonoBehaviour
                 Debug.LogError("Could not resolve all Firebase dependencies: " + task.Result);
             }
         });
-
-        RemoteConfigStart();
+        RemoteConfigGet();
 
     }
-
+    
     private void Update()
     {
 #if UNITY_IOS
@@ -97,51 +95,49 @@ public class TestScene : MonoBehaviour
         Debug.Log("Game Start!!!");
     }
 
-    //void LoadingEnable(bool isEnable)
-    //{
-    //_loadingCanvas.SetActive(isEnable);
-
-    //}
-    
-
+    #region HashCode
+    void HashCodeGeneration()
+    {
+        if (!CodeHashGenerator.IsTargetPlatformCompatible()) return;
+        CodeHashGenerator.HashGenerated += OnGotHash;
+        CodeHashGenerator.Generate();
+    }
+    void OnGotHash(HashGeneratorResult result)
+    {
+        if (!result.Success) return;
+        if (remoteConfig._hashCode == result.CodeHash)
+        {
+            testText.text = "코드 같음";
+            AcceptTermsInstantiate();
+        }
+        else
+        {
+            testText.text = "코드 다름";
+        }
+    }
+    #endregion
 
     #region RemoteConfig
-    void RemoteConfigStart()
+    void RemoteConfigGet()
     {
-        plugin.RemoteConfig.Init("dbtest-remote-config-5EDF726F", (isSuccess) =>
-        {
-            if (plugin.RemoteConfig.GetBool("dbtest-remote-config-5EDF726F", "_isStart"))
+        plugin.RemoteConfig.Init("dbtest-remote-config-5EDF726F", (isSuccess) => {
+            if (isSuccess)
             {
-                RemoteConfigVersionCheck();
-            }
-            else
-            {
-                GameObject inspectionWindow = Instantiate(_inspectionWindowPrefeb);
-                inspectionWindow.transform.SetParent(_canvas.transform, false);
-                //LoadingEnable(false);
-            }
-        });
-    }
-    void RemoteConfigVersionCheck()
-    {
-        plugin.RemoteConfig.Init("dbtest-remote-config-5EDF726F", (isSuccess) =>
-        {
-            if (plugin.RemoteConfig.GetString("dbtest-remote-config-5EDF726F", "_bundleVersion") == Application.version)
-            {
-                //Accept Terms
-                if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 0)
+                string json = plugin.RemoteConfig.GetJson("dbtest-remote-config-5EDF726F", "_remoteConfig").ToString();
+                remoteConfig = JsonUtility.FromJson<RemoteConfig>(json);
+                if (remoteConfig._isStart)
                 {
-                    acceptTermsWindow = Instantiate(_acceptTermsWindowPrefeb);
-                    acceptTermsWindow.transform.SetParent(_canvas.transform, false);
-                    ToggleFind(acceptTermsWindow);
+                    testText.text = "스타트!";
+                    if (remoteConfig._bundleVersion == Application.version)
+                    {
+                        testText.text = "버전 같음";
+                        HashCodeGeneration();
+                    }
+                    else testText.text = "버전 다름";
                 }
-                else if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 1) TokenLogin();
+                else testText.text = "정지!";
             }
-            else
-            {
-                Debug.Log("버전이 다름. 업데이트 필요!!");
-                StartCoroutine(CheckForUpdate());
-            }
+            else testText.text = "Json놉!";
         });
     }
     #endregion
@@ -149,6 +145,21 @@ public class TestScene : MonoBehaviour
     #region AccepTerms
 
     GameObject acceptTermsWindow;
+    void AcceptTermsInstantiate()
+    {
+        if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 0)
+        {
+            testText.text = "약관 중";
+            acceptTermsWindow = Instantiate(_acceptTermsWindowPrefeb);
+            acceptTermsWindow.transform.SetParent(_canvas.transform, false);
+            ToggleFind(acceptTermsWindow);
+        }
+        else if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 1)
+        { 
+            testText.text = "약관 했음.";
+            TokenLogin(); 
+        }
+    }
     void ToggleFind(GameObject acceptTermsWindow)
     {
         _acceptTermsTiggle = acceptTermsWindow.transform.Find("AcceptTermsTiggle").gameObject.GetComponent<Toggle>();
@@ -168,7 +179,6 @@ public class TestScene : MonoBehaviour
         _startButton.onClick.AddListener(AcceptTermsStartButton);
         _allAgreeButton = acceptTermsWindow.transform.Find("AllAgreeStart").gameObject.GetComponent<Button>();
         _allAgreeButton.onClick.AddListener(AcceptTermsAllAgreeButton);
-        //LoadingEnable(false);
     }
     void PushNightTiggleEnable(bool ison)
     {
@@ -197,7 +207,6 @@ public class TestScene : MonoBehaviour
         TokenLogin();
         AcceptTermsWindowDestroy();
     }
-
     void AcceptTermsAllAgreeButton()
     {
         FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
@@ -231,7 +240,6 @@ public class TestScene : MonoBehaviour
 
             if (appUpdateInfoResult.UpdateAvailability == UpdateAvailability.UpdateAvailable)
             {
-                //LoadingEnable(false);
                 var appUpdateOptions = AppUpdateOptions.ImmediateAppUpdateOptions();
                 var startUpdateRequest = appUpdateManager.StartUpdate(appUpdateInfoResult, appUpdateOptions);
                 yield return startUpdateRequest;
@@ -292,7 +300,6 @@ public class TestScene : MonoBehaviour
         loginAppleButton = Instantiate(_loginAppleButtonPrefeb);
         loginAppleButton.transform.SetParent(_canvas.transform, false);
         loginAppleButton.onClick.AddListener(AppleSignInButton);
-        //LoadingEnable(false);
     }
     void LoginButtonDestroy()
     {
@@ -572,7 +579,7 @@ public class TestScene : MonoBehaviour
                 Button tapToStartButton = Instantiate(_tapToStartButton);
                 tapToStartButton.transform.SetParent(_canvas.transform, false);
                 tapToStartButton.onClick.AddListener(TapToStartButton);
-                //LoadingEnable(false);
+                testText.text = "토큰로그인";
             }
             else
             {
@@ -589,6 +596,7 @@ public class TestScene : MonoBehaviour
                 }
                 else Debug.Log("Fail");
                 LoginButtonInstantiate();
+                testText.text = "로그인실패";
             }
         });
     }
@@ -767,4 +775,11 @@ public class TestScene : MonoBehaviour
     {
         Application.Quit();
     }
+}
+[System.Serializable]
+public struct RemoteConfig
+{
+    public bool _isStart;
+    public string _bundleVersion;
+    public string _hashCode;
 }
