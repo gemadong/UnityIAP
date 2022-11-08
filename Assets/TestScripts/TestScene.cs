@@ -40,7 +40,6 @@ public class TestScene : MonoBehaviour
     [SerializeField] private TextMeshProUGUI testText;
 #if UNITY_ANDROID
     [SerializeField] private GameObject _updateWindowPrefeb;
-
 #endif
 
     Toggle _acceptTermsTiggle;
@@ -51,8 +50,8 @@ public class TestScene : MonoBehaviour
     Button _allAgreeButton;
 
     Plugin plugin;
-    GoogleSignInConfiguration googleSignInConfiguration;
     RemoteConfig remoteConfig;
+    GoogleSignInConfiguration googleSignInConfiguration;
 
     bool googleIsLogin = false;
     bool isnightEnabled = true;
@@ -79,10 +78,15 @@ public class TestScene : MonoBehaviour
                 Debug.LogError("Could not resolve all Firebase dependencies: " + task.Result);
             }
         });
-        CheckIfDeviceIsRooted();
 
+#if UNITY_ANDROID
+        CheckIfDeviceIsRooted();
+#endif
+#if UNITY_IOS
+        RemoteConfigGet();
+#endif
     }
-    
+
     private void Update()
     {
 #if UNITY_IOS
@@ -96,7 +100,7 @@ public class TestScene : MonoBehaviour
         testText.text = "Game Start!!!";
     }
 
-    #region RemoteConfig
+#region RootCheck
     public static string GetData()
     {
         string result = "";
@@ -179,43 +183,54 @@ public class TestScene : MonoBehaviour
     {
         if (isRooted())
         {
-            testText.text = "루트모드!";
+            testText.text = "????!";
         }
         else
         {
-            testText.text = "루트 아님!";
+            testText.text = "?? ??!";
             RemoteConfigGet();
         }
 
     }
-    #endregion
+#endregion
 
-    #region RemoteConfig
+#region RemoteConfig
     void RemoteConfigGet()
     {
         plugin.RemoteConfig.Init("dbtest-remote-config-5EDF726F", (isSuccess) => {
             if (isSuccess)
             {
+#if UNITY_ANDROID
                 string json = plugin.RemoteConfig.GetJson("dbtest-remote-config-5EDF726F", "_remoteConfig").ToString();
+#endif
+#if UNITY_IOS
+                string json = plugin.RemoteConfig.GetJson("dbtest-remote-config-5EDF726F", "_remoteConfigIOS").ToString();
+#endif
                 remoteConfig = JsonUtility.FromJson<RemoteConfig>(json);
                 if (remoteConfig._isStart)
                 {
-                    testText.text = "스타트!";
+                    testText.text = "???!";
+#if UNITY_ANDROID
                     if (remoteConfig._bundleVersion == Application.version)
                     {
-                        testText.text = "버전 같음";
+                        testText.text = "?? ??";
                         HashCodeGeneration();
                     }
-                    else testText.text = "버전 다름";
+                    else testText.text = "?? ??";
+#endif
+#if UNITY_IOS
+                    AcceptTermsInstantiate();
+#endif
                 }
-                else testText.text = "정지!";
+                else testText.text = "??!";
             }
-            else testText.text = "Json놉!";
+            else testText.text = "Json?!";
         });
     }
     #endregion
 
-    #region HashCode
+#if UNITY_ANDROID
+#region HashCode
     void HashCodeGeneration()
     {
         if (!CodeHashGenerator.IsTargetPlatformCompatible()) return;
@@ -227,32 +242,91 @@ public class TestScene : MonoBehaviour
         if (!result.Success) return;
         if (remoteConfig._hashCode == result.CodeHash)
         {
-            testText.text = "코드 같음";
+            testText.text = "?? ??";
             AcceptTermsInstantiate();
         }
         else
         {
-            testText.text = "코드 다름";
+            testText.text = "?? ??";
         }
     }
     #endregion
+#region InAppUpdate
+#if UNITY_ANDROID
+    IEnumerator CheckForUpdate()
+    {
+        AppUpdateManager appUpdateManager = new AppUpdateManager();
+        PlayAsyncOperation<AppUpdateInfo, AppUpdateErrorCode> appUpdateInfoOperation = appUpdateManager.GetAppUpdateInfo();
 
-    #region AccepTerms
+        yield return appUpdateInfoOperation;
+        if (appUpdateInfoOperation.IsSuccessful)
+        {
+            var appUpdateInfoResult = appUpdateInfoOperation.GetResult();
+
+            if (appUpdateInfoResult.UpdateAvailability == UpdateAvailability.UpdateAvailable)
+            {
+                var appUpdateOptions = AppUpdateOptions.ImmediateAppUpdateOptions();
+                var startUpdateRequest = appUpdateManager.StartUpdate(appUpdateInfoResult, appUpdateOptions);
+                yield return startUpdateRequest;
+            }
+            else 
+            {
+                GameObject updateWindowPrefeb = Instantiate(_updateWindowPrefeb);
+                updateWindowPrefeb.transform.SetParent(_canvas.transform, false);
+                Button upDateButten = updateWindowPrefeb.transform.Find("UpDateButton").gameObject.GetComponent<Button>();
+                upDateButten.onClick.AddListener(UpDateButton);
+                //Accept Terms
+                //if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 0)
+                //{
+                //    acceptTermsWindow = Instantiate(_acceptTermsWindowPrefeb);
+                //    acceptTermsWindow.transform.SetParent(_canvas.transform, false);
+                //    ToggleFind(acceptTermsWindow);
+                //}
+                //else if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 1) TokenLogin();
+                //Debug.Log("NO Update");
+            } 
+        }
+        else
+        {
+            GameObject updateWindowPrefeb = Instantiate(_updateWindowPrefeb);
+            updateWindowPrefeb.transform.SetParent(_canvas.transform, false);
+            Button upDateButten = updateWindowPrefeb.transform.Find("UpDateButton").gameObject.GetComponent<Button>();
+            upDateButten.onClick.AddListener(UpDateButton);
+            //Accept Terms
+            //if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 0)
+            //{
+            //    acceptTermsWindow = Instantiate(_acceptTermsWindowPrefeb);
+            //    acceptTermsWindow.transform.SetParent(_canvas.transform, false);
+            //    ToggleFind(acceptTermsWindow);
+            //}
+            //else if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 1) TokenLogin();
+            //Debug.Log("NO Update");
+        }
+    }
+    void UpDateButton()
+    {
+        Debug.Log("??? ???? ??!!");
+    }
+#endif
+#endregion
+#endif
+
+#region AccepTerms
 
     GameObject acceptTermsWindow;
     void AcceptTermsInstantiate()
     {
         if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 0)
         {
-            testText.text = "약관 중";
+            testText.text = "?? ?";
             acceptTermsWindow = Instantiate(_acceptTermsWindowPrefeb);
             acceptTermsWindow.transform.SetParent(_canvas.transform, false);
             ToggleFind(acceptTermsWindow);
         }
         else if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 1)
-        { 
-            testText.text = "약관 했음.";
-            TokenLogin(); 
+        {
+            testText.text = "?? ??.";
+            TokenLogin();
         }
     }
     void ToggleFind(GameObject acceptTermsWindow)
@@ -319,68 +393,9 @@ public class TestScene : MonoBehaviour
         _pushNightTiggle = null;
         Destroy(acceptTermsWindow);
     }
-    #endregion
+#endregion
 
-    #region InAppUpdate
-#if UNITY_ANDROID
-    IEnumerator CheckForUpdate()
-    {
-        AppUpdateManager appUpdateManager = new AppUpdateManager();
-        PlayAsyncOperation<AppUpdateInfo, AppUpdateErrorCode> appUpdateInfoOperation = appUpdateManager.GetAppUpdateInfo();
-
-        yield return appUpdateInfoOperation;
-        if (appUpdateInfoOperation.IsSuccessful)
-        {
-            var appUpdateInfoResult = appUpdateInfoOperation.GetResult();
-
-            if (appUpdateInfoResult.UpdateAvailability == UpdateAvailability.UpdateAvailable)
-            {
-                var appUpdateOptions = AppUpdateOptions.ImmediateAppUpdateOptions();
-                var startUpdateRequest = appUpdateManager.StartUpdate(appUpdateInfoResult, appUpdateOptions);
-                yield return startUpdateRequest;
-            }
-            else 
-            {
-                GameObject updateWindowPrefeb = Instantiate(_updateWindowPrefeb);
-                updateWindowPrefeb.transform.SetParent(_canvas.transform, false);
-                Button upDateButten = updateWindowPrefeb.transform.Find("UpDateButton").gameObject.GetComponent<Button>();
-                upDateButten.onClick.AddListener(UpDateButton);
-                //Accept Terms
-                //if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 0)
-                //{
-                //    acceptTermsWindow = Instantiate(_acceptTermsWindowPrefeb);
-                //    acceptTermsWindow.transform.SetParent(_canvas.transform, false);
-                //    ToggleFind(acceptTermsWindow);
-                //}
-                //else if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 1) TokenLogin();
-                //Debug.Log("NO Update");
-            } 
-        }
-        else
-        {
-            GameObject updateWindowPrefeb = Instantiate(_updateWindowPrefeb);
-            updateWindowPrefeb.transform.SetParent(_canvas.transform, false);
-            Button upDateButten = updateWindowPrefeb.transform.Find("UpDateButton").gameObject.GetComponent<Button>();
-            upDateButten.onClick.AddListener(UpDateButton);
-            //Accept Terms
-            //if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 0)
-            //{
-            //    acceptTermsWindow = Instantiate(_acceptTermsWindowPrefeb);
-            //    acceptTermsWindow.transform.SetParent(_canvas.transform, false);
-            //    ToggleFind(acceptTermsWindow);
-            //}
-            //else if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 1) TokenLogin();
-            //Debug.Log("NO Update");
-        }
-    }
-    void UpDateButton()
-    {
-        Debug.Log("플래이 스토어로 접속!!");
-    }
-#endif
-    #endregion
-
-    #region LoginButton
+#region LoginButton
     Button loginGoogleButton;
     Button loginFacebookButton;
     Button loginAppleButton;
@@ -402,9 +417,9 @@ public class TestScene : MonoBehaviour
         Destroy(loginFacebookButton.gameObject);
         Destroy(loginAppleButton.gameObject);
     }
-    #endregion
-    
-    #region FacebookLogin
+#endregion
+
+#region FacebookLogin
     void OnFBInitComplete()
     {
         if (FB.IsInitialized) FB.ActivateApp();
@@ -471,9 +486,9 @@ public class TestScene : MonoBehaviour
             Debug.Log("Login Cancel");
         }
     }
-    #endregion
+#endregion
 
-    #region GoogleLogin
+#region GoogleLogin
     public void GoogleSignInButton()
     {
         googleSignInConfiguration = new GoogleSignInConfiguration
@@ -569,9 +584,9 @@ public class TestScene : MonoBehaviour
             }
         });
     }
-    #endregion
+#endregion
 
-    #region AppleLogin
+#region AppleLogin
     public void AppleSignInButton()
     {
 #if UNITY_ANDROID
@@ -655,9 +670,9 @@ public class TestScene : MonoBehaviour
     }
 
 
-    #endregion
+#endregion
 
-    #region TokenLogin
+#region TokenLogin
     public void TokenLogin()
     {
         plugin.AccountTokenSignIn((status, errorCode, jsonString, values) => {
@@ -674,14 +689,14 @@ public class TestScene : MonoBehaviour
                 Button tapToStartButton = Instantiate(_tapToStartButton);
                 tapToStartButton.transform.SetParent(_canvas.transform, false);
                 tapToStartButton.onClick.AddListener(TapToStartButton);
-                testText.text = "토큰로그인";
+                testText.text = "?????";
             }
             else
             {
                 if (values != null)
                 {
                     if (values["ErrorCode"].ToString() == "30007") Debug.Log(values["WithdrawalKey"].ToString());
-                    else if (values["ErrorCode"].ToString() == "30006") 
+                    else if (values["ErrorCode"].ToString() == "30006")
                     {
                         TokenLogOut();
                         return;
@@ -691,13 +706,13 @@ public class TestScene : MonoBehaviour
                 }
                 else Debug.Log("Fail");
                 LoginButtonInstantiate();
-                testText.text = "로그인실패";
+                testText.text = "?????";
             }
         });
     }
-    #endregion
+#endregion
 
-    #region TokenOut
+#region TokenOut
     public void TokenLogOut()
     {
         plugin.AccountTokenSignOut((status, errorCode, jsonString, values) => {
@@ -713,9 +728,9 @@ public class TestScene : MonoBehaviour
             else Debug.Log("Fail");
         });
     }
-    #endregion
+#endregion
 
-    #region TokenRefresh
+#region TokenRefresh
     public void TokenRefresh()
     {
         plugin.AccountTokenRefresh((status, errorCode, jsonString, values) => {
@@ -742,9 +757,9 @@ public class TestScene : MonoBehaviour
             }
         });
     }
-    #endregion
+#endregion
 
-    #region Analytics
+#region Analytics
     public void LogEvent(string eventName)
     {
         FirebaseAnalytics.LogEvent(eventName);
@@ -765,9 +780,9 @@ public class TestScene : MonoBehaviour
     {
         FirebaseAnalytics.LogEvent(eventName, paramArray);
     }
-    #endregion
+#endregion
 
-    #region PushMessaging
+#region PushMessaging
 #if UNITY_ANDROID
     public void StartSaveToken()
     {
@@ -818,7 +833,7 @@ public class TestScene : MonoBehaviour
     {
         NotificationServices.RegisterForNotifications(NotificationType.Alert | NotificationType.Badge | NotificationType.Sound, true);
         StartCoroutine(RequestAuthorization());
-        
+
     }
     void IOSToken(string deviceToken)
     {
@@ -864,7 +879,7 @@ public class TestScene : MonoBehaviour
     {
         Debug.Log("Received a new message from: " + e.Message.From);
     }
-    #endregion
+#endregion
 
     public void ExitButton()
     {
@@ -875,6 +890,8 @@ public class TestScene : MonoBehaviour
 public struct RemoteConfig
 {
     public bool _isStart;
+#if UNITY_ANDROID
     public string _bundleVersion;
     public string _hashCode;
+#endif
 }
