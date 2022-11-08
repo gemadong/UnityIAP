@@ -10,21 +10,33 @@
     "m_KnownPackagesForSerialization": [
         {
             "deviceId": "127.0.0.1:5555",
-            "name": "com.bluestacks.launcher",
-            "processId": 2346,
+            "name": "com.gemadong.unityiap",
+            "processId": 16364,
             "exited": true
-        },
-        {
-            "deviceId": "127.0.0.1:5555",
-            "name": "com.bluestacks.launcher",
-            "processId": 2299,
-            "exited": false
         },
         {
             "deviceId": "127.0.0.1:5555",
             "name": "com.gemadong.unityiap",
-            "processId": 16364,
+            "processId": 12722,
             "exited": true
+        },
+        {
+            "deviceId": "127.0.0.1:5555",
+            "name": "com.gemadong.unityiap",
+            "processId": 7310,
+            "exited": true
+        },
+        {
+            "deviceId": "127.0.0.1:5555",
+            "name": "com.AbleGames.DalToKi",
+            "processId": 14169,
+            "exited": true
+        },
+        {
+            "deviceId": "127.0.0.1:5555",
+            "name": "com.gemadong.unityiap",
+            "processId": 4198,
+            "exited": false
         },
         {
             "deviceId": "RF9RA00Z7ZT",
@@ -36,6 +48,24 @@
             "deviceId": "RF9RA00Z7ZT",
             "name": "com.gemadong.unityiap",
             "processId": 28501,
+            "exited": true
+        },
+        {
+            "deviceId": "RF9RA00Z7ZT",
+            "name": "com.android.settings",
+            "processId": 17682,
+            "exited": true
+        },
+        {
+            "deviceId": "RF9RA00Z7ZT",
+            "name": "com.gemadong.unityiap",
+            "processId": 6809,
+            "exited": true
+        },
+        {
+            "deviceId": "RF9RA00Z7ZT",
+            "name": "com.android.vending",
+            "processId": 5686,
             "exited": false
         },
         {
