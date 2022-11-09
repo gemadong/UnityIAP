@@ -96,19 +96,18 @@ public class TestScene : MonoBehaviour
                 Debug.LogError("Could not resolve all Firebase dependencies: " + task.Result);
             }
         });
-        LoginButtonInstantiate();
 
 #if UNITY_ANDROID
-        //CheckIfDeviceIsRooted();
+        CheckIfDeviceIsRooted();
 #endif
 #if UNITY_IOS
-        //RemoteConfigGet();
+        RemoteConfigGet();
 #endif
     }
 
     private void Update()
     {
-        plugin.AccountCheckDuplicate(OnCheckAccountDuplicate);
+        //plugin.AccountCheckDuplicate(OnCheckAccountDuplicate);
         Services();
 #if UNITY_IOS
         //Apple Login
