@@ -90,12 +90,12 @@ public class TestScene : MonoBehaviour
                 Debug.LogError("Could not resolve all Firebase dependencies: " + task.Result);
             }
         });
-
+        LoginButtonInstantiate();
 #if UNITY_ANDROID
-        CheckIfDeviceIsRooted();
+        //CheckIfDeviceIsRooted();
 #endif
 #if UNITY_IOS
-        RemoteConfigGet();
+        //RemoteConfigGet();
 #endif
     }
 
@@ -263,8 +263,8 @@ public class TestScene : MonoBehaviour
         }
     }
     #endregion
+
 #region InAppUpdate
-#if UNITY_ANDROID
     IEnumerator CheckForUpdate()
     {
         AppUpdateManager appUpdateManager = new AppUpdateManager();
@@ -319,7 +319,6 @@ public class TestScene : MonoBehaviour
     {
         Debug.Log("??? ???? ??!!");
     }
-#endif
 #endregion
 #endif
 
@@ -695,7 +694,7 @@ public class TestScene : MonoBehaviour
 
     #endregion
 
-    #region TokenLogin
+#region TokenLogin
     public void TokenLogin()
     {
         plugin.AccountTokenInfo((status, errorCode, jsonString, values) => {
