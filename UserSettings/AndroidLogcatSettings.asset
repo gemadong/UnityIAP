@@ -1,5 +1,5 @@
 {
-    "m_SelectedDeviceId": "RF9RA00Z7ZT",
+    "m_SelectedDeviceId": "127.0.0.1:5555",
     "m_SelectedPackage": {
         "deviceId": "",
         "name": "",
@@ -8,12 +8,6 @@
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
-        {
-            "deviceId": "127.0.0.1:5555",
-            "name": "com.bluestacks.launcher",
-            "processId": 2340,
-            "exited": true
-        },
         {
             "deviceId": "127.0.0.1:5555",
             "name": "com.dh.anticheat",
@@ -36,6 +30,12 @@
             "deviceId": "127.0.0.1:5555",
             "name": "com.gemadong.unityiap",
             "processId": 4599,
+            "exited": true
+        },
+        {
+            "deviceId": "127.0.0.1:5555",
+            "name": "com.gemadong.unityiap",
+            "processId": 4458,
             "exited": false
         },
         {
@@ -95,7 +95,7 @@
             },
             {
                 "m_Name": "No Filter",
-                "m_Selected": false
+                "m_Selected": true
             },
             {
                 "m_Name": "",
@@ -111,7 +111,7 @@
             },
             {
                 "m_Name": "Unity",
-                "m_Selected": true
+                "m_Selected": false
             },
             {
                 "m_Name": "CRASH",

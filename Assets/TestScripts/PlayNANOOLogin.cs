@@ -330,7 +330,7 @@ public class PlayNANOOLogin : MonoBehaviour
 #region TokenLogin
     public void TokenLogin()
     {
-        plugin.AccountTokenSignIn((status, errorCode, jsonString, values) => {
+        plugin.AccountTokenInfo((status, errorCode, jsonString, values) => {
             if (status.Equals(Configure.PN_API_STATE_SUCCESS))
             {
                 Debug.Log(values["access_token"].ToString());
