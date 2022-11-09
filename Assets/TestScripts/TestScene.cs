@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Threading.Tasks;
+using System;
 using Google;
 using PlayNANOO;
 using Facebook.Unity;
@@ -51,6 +52,8 @@ public class TestScene : MonoBehaviour
     Button _allAgreeButton;
 
     Plugin plugin;
+    Queue<bool> queue;
+    string token;
     RemoteConfig remoteConfig;
     GoogleSignInConfiguration googleSignInConfiguration;
 
@@ -76,6 +79,9 @@ public class TestScene : MonoBehaviour
     {
         //PlayNANOO
         plugin = Plugin.GetInstance();
+
+        queue = new Queue<bool>();
+
         //Firebase Push
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
         {
@@ -91,6 +97,7 @@ public class TestScene : MonoBehaviour
             }
         });
         LoginButtonInstantiate();
+
 #if UNITY_ANDROID
         //CheckIfDeviceIsRooted();
 #endif
@@ -101,12 +108,20 @@ public class TestScene : MonoBehaviour
 
     private void Update()
     {
+        plugin.AccountCheckDuplicate(OnCheckAccountDuplicate);
+        Services();
 #if UNITY_IOS
         //Apple Login
         _appleAuthManager?.Update();
 #endif
     }
-
+    void OnCheckAccountDuplicate(bool isDuplicate)
+    {
+        if (isDuplicate)
+        {
+            Debug.LogError("Duplicate connection has been detected.");
+        }
+    }
     public void TapToStartButton()
     {
         testText.text = "Game Start!!!";
@@ -424,9 +439,9 @@ public class TestScene : MonoBehaviour
     }
     void LoginButtonDestroy()
     {
-        Destroy(loginGoogleButton.gameObject);
-        Destroy(loginFacebookButton.gameObject);
-        Destroy(loginAppleButton.gameObject);
+        //Destroy(loginGoogleButton.gameObject);
+        //Destroy(loginFacebookButton.gameObject);
+        //Destroy(loginAppleButton.gameObject);
     }
 #endregion
 
@@ -517,6 +532,54 @@ public class TestScene : MonoBehaviour
         GoogleSignIn.Configuration.RequestIdToken = true;
         GoogleSignIn.DefaultInstance.SignIn().ContinueWith(OnAuthenticationFinished);
     }
+    void Services()
+    {
+        while (queue.Count > 0)
+        {
+            bool isResult = queue.Dequeue();
+            if (isResult)
+            {
+                plugin.AccountSocialSignIn(token, Configure.PN_ACCOUNT_GOOGLE, (status, errorCode, jsonString, values) =>
+                {
+                    if (status == Configure.PN_API_STATE_SUCCESS)
+                    {
+                        Debug.Log(values["access_token"].ToString());
+                        Debug.Log(values["refresh_token"].ToString());
+                        Debug.Log(values["uuid"].ToString());
+                        Debug.Log(values["openID"].ToString());
+                        Debug.Log(values["nickname"].ToString());
+                        Debug.Log(values["linkedID"].ToString());
+                        Debug.Log(values["linkedType"].ToString());
+                        Debug.Log(values["country"].ToString());
+                        googleIsLogin = true;
+                        LoginButtonDestroy();
+                    }
+                    else
+                    {
+                        if (values != null)
+                        {
+                            if (values["ErrorCode"].ToString() == "30007")
+                            {
+                                Debug.Log(values["WithdrawalKey"].ToString());
+                            }
+                            else
+                            {
+                                Debug.Log("Fail");
+                            }
+                        }
+                        else
+                        {
+                            Debug.Log("Fail");
+                        }
+                    }
+                });
+            }
+            else
+            {
+                Debug.Log("Fail");
+            }
+        }
+    }
 
     internal void OnAuthenticationFinished(Task<GoogleSignInUser> task)
     {
@@ -528,6 +591,7 @@ public class TestScene : MonoBehaviour
                 {
                     GoogleSignIn.SignInException error = (GoogleSignIn.SignInException)enumerator.Current;
                     Debug.Log("Got Error: " + error.Status + " " + error.Message);
+                    queue.Enqueue(false);
                 }
                 else
                 {
@@ -541,66 +605,14 @@ public class TestScene : MonoBehaviour
         }
         else
         {
-            StartCoroutine(SocialLogin(task.Result.IdToken));
+            token = task.Result.IdToken;
+            queue.Enqueue(true);
         }
     }
 
-    private string _storedToken;
+    #endregion
 
-    IEnumerator SocialLogin(string token)
-    {
-        yield return new WaitForEndOfFrame();
-
-        Login(token);
-
-        yield break;
-    }
-
-    private void Login(string token)
-    {
-        plugin.AccountSocialSignIn(token, Configure.PN_ACCOUNT_GOOGLE, (status, errorCode, jsonString, values) =>
-        {
-            Debug.Log("Login Status : " + status);
-            if (status == Configure.PN_API_STATE_SUCCESS)
-            {
-                googleIsLogin = true;
-                Debug.Log(values["access_token"].ToString());
-                Debug.Log(values["refresh_token"].ToString());
-                Debug.Log(values["uuid"].ToString());
-                Debug.Log(values["openID"].ToString());
-                Debug.Log(values["nickname"].ToString());
-                Debug.Log(values["linkedID"].ToString());
-                Debug.Log(values["linkedType"].ToString());
-                Debug.Log(values["country"].ToString());
-                LoginButtonDestroy();
-            }
-            else
-            {
-                if (values != null)
-                {
-                    if (values["ErrorCode"].ToString() == "30007")
-                    {
-                        Debug.Log(values["WithdrawalKey"].ToString());
-                    }
-                    else if (values["ErrorCode"].ToString() == "30006")
-                    {
-                        testText.text = "ErrorCode 30006";
-                    }
-                    else
-                    {
-                        Debug.Log("Fail");
-                    }
-                }
-                else
-                {
-                    Debug.Log("Fail");
-                }
-            }
-        });
-    }
-#endregion
-
-#region AppleLogin
+    #region AppleLogin
     public void AppleSignInButton()
     {
 #if UNITY_ANDROID
@@ -698,6 +710,7 @@ public class TestScene : MonoBehaviour
     public void TokenLogin()
     {
         plugin.AccountTokenInfo((status, errorCode, jsonString, values) => {
+            testText.text = values["ErrorCode"].ToString();
             if (status.Equals(Configure.PN_API_STATE_SUCCESS))
             {
                 Debug.Log(values["access_token"].ToString());
