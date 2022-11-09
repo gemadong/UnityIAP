@@ -195,11 +195,11 @@ public class TestScene : MonoBehaviour
     {
         if (isRooted())
         {
-            testText.text = "????!";
+            testText.text = "Root Mode";
         }
         else
         {
-            testText.text = "?? ??!";
+            testText.text = "No Root";
             RemoteConfigGet();
         }
 
@@ -221,20 +221,20 @@ public class TestScene : MonoBehaviour
                 remoteConfig = JsonUtility.FromJson<RemoteConfig>(json);
                 if (remoteConfig._isStart)
                 {
-                    testText.text = "???!";
+                    testText.text = "Start!";
 #if UNITY_ANDROID
                     if (remoteConfig._bundleVersion == Application.version)
                     {
-                        testText.text = "?? ??";
+                        testText.text = "Version Good";
                         HashCodeGeneration();
                     }
-                    else testText.text = "?? ??";
+                    else testText.text = "No Version";
 #endif
 #if UNITY_IOS
                     AcceptTermsInstantiate();
 #endif
                 }
-                else testText.text = "??!";
+                else testText.text = "Stop!";
             }
             else testText.text = "Json?!";
         });
@@ -254,12 +254,12 @@ public class TestScene : MonoBehaviour
         if (!result.Success) return;
         if (remoteConfig._hashCode == result.CodeHash)
         {
-            testText.text = "?? ??";
+            testText.text = "Hash Code";
             AcceptTermsInstantiate();
         }
         else
         {
-            testText.text = "?? ??";
+            testText.text = "No Hash";
         }
     }
     #endregion
@@ -330,14 +330,14 @@ public class TestScene : MonoBehaviour
     {
         if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 0)
         {
-            testText.text = "?? ?";
+            testText.text = "AccepTerms";
             acceptTermsWindow = Instantiate(_acceptTermsWindowPrefeb);
             acceptTermsWindow.transform.SetParent(_canvas.transform, false);
             ToggleFind(acceptTermsWindow);
         }
         else if (PlayerPrefs.GetInt("FirstAcceptTerms", 0) == 1)
         {
-            testText.text = "?? ??.";
+            testText.text = "AccepTerms Finish.";
             TokenLogin();
         }
     }
@@ -481,6 +481,10 @@ public class TestScene : MonoBehaviour
                         {
                             Debug.Log(values["WithdrawalKey"].ToString());
                         }
+                        else if (values["ErrorCode"].ToString() == "30006")
+                        {
+                            testText.text = "ErrorCode 30006";
+                        }
                         else
                         {
                             Debug.Log("Fail");
@@ -581,8 +585,7 @@ public class TestScene : MonoBehaviour
                     }
                     else if (values["ErrorCode"].ToString() == "30006")
                     {
-                        TokenLogOut();
-                        return;
+                        testText.text = "ErrorCode 30006";
                     }
                     else
                     {
@@ -623,6 +626,10 @@ public class TestScene : MonoBehaviour
                     if (values["ErrorCode"].ToString() == "30007")
                     {
                         Debug.Log(values["WithdrawalKey"].ToString());
+                    }
+                    else if (values["ErrorCode"].ToString() == "30006")
+                    {
+                        testText.text = "ErrorCode 30006";
                     }
                     else
                     {
@@ -665,6 +672,10 @@ public class TestScene : MonoBehaviour
                             if (values != null)
                             {
                                 if (values["ErrorCode"].ToString() == "30007") Debug.Log(values["WithdrawalKey"].ToString());
+                                else if (values["ErrorCode"].ToString() == "30006")
+                                {
+                                     testText.text = "ErrorCode 30006";
+                                }
                                 else Debug.Log("Fail");
                             }
                             else Debug.Log("Fail");
@@ -682,9 +693,9 @@ public class TestScene : MonoBehaviour
     }
 
 
-#endregion
+    #endregion
 
-#region TokenLogin
+    #region TokenLogin
     public void TokenLogin()
     {
         plugin.AccountTokenSignIn((status, errorCode, jsonString, values) => {
@@ -701,7 +712,7 @@ public class TestScene : MonoBehaviour
                 Button tapToStartButton = Instantiate(_tapToStartButton);
                 tapToStartButton.transform.SetParent(_canvas.transform, false);
                 tapToStartButton.onClick.AddListener(TapToStartButton);
-                testText.text = "?????";
+                testText.text = "Token Login";
             }
             else
             {
@@ -710,15 +721,14 @@ public class TestScene : MonoBehaviour
                     if (values["ErrorCode"].ToString() == "30007") Debug.Log(values["WithdrawalKey"].ToString());
                     else if (values["ErrorCode"].ToString() == "30006")
                     {
-                        TokenLogOut();
-                        return;
+                        testText.text = "ErrorCode 30006";
                     }
                     else if (values["ErrorCode"].ToString() == "30002") TokenRefresh();
                     else Debug.Log("Fail");
                 }
                 else Debug.Log("Fail");
                 LoginButtonInstantiate();
-                testText.text = "?????";
+                testText.text = "No Login";
             }
         });
     }
