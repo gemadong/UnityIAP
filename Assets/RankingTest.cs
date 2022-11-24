@@ -35,7 +35,7 @@ public class RankingTest : MonoBehaviour
                 Debug.Log("ranking" + dictionary["ranking"]);
                 Debug.Log("data" + dictionary["data"]);
                 Debug.Log("total_player" + dictionary["total_player"]);
-                playerData = dictionary["data"].ToString();
+                //playerData = dictionary["data"].ToString();
             }
             else
             {

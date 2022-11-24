@@ -10,39 +10,33 @@
     "m_KnownPackagesForSerialization": [
         {
             "deviceId": "127.0.0.1:5555",
-            "name": "com.dh.anticheat",
-            "processId": 12450,
-            "exited": true
-        },
-        {
-            "deviceId": "127.0.0.1:5555",
-            "name": "com.dh.anticheat",
-            "processId": 12777,
-            "exited": true
-        },
-        {
-            "deviceId": "127.0.0.1:5555",
-            "name": "com.dh.remoteconfigtest",
-            "processId": 13473,
+            "name": "com.miople.projectr",
+            "processId": 6199,
             "exited": true
         },
         {
             "deviceId": "127.0.0.1:5555",
             "name": "com.gemadong.unityiap",
-            "processId": 4599,
+            "processId": 4214,
             "exited": true
         },
         {
             "deviceId": "127.0.0.1:5555",
-            "name": "com.gemadong.unityiap",
-            "processId": 4458,
+            "name": "com.miople.projectr",
+            "processId": 4649,
+            "exited": true
+        },
+        {
+            "deviceId": "127.0.0.1:5555",
+            "name": "com.miople.projectr",
+            "processId": 4425,
+            "exited": true
+        },
+        {
+            "deviceId": "127.0.0.1:5555",
+            "name": "com.bluestacks.launcher",
+            "processId": 2331,
             "exited": false
-        },
-        {
-            "deviceId": "RF9RA00Z7ZT",
-            "name": "com.gemadong.unityiap",
-            "processId": 27619,
-            "exited": true
         },
         {
             "deviceId": "RF9RA00Z7ZT",
@@ -66,6 +60,12 @@
             "deviceId": "RF9RA00Z7ZT",
             "name": "com.android.vending",
             "processId": 5686,
+            "exited": true
+        },
+        {
+            "deviceId": "RF9RA00Z7ZT",
+            "name": "com.miople.projectr",
+            "processId": 6926,
             "exited": false
         },
         {
@@ -138,7 +138,7 @@
         "Behavior": 0
     },
     "m_FilterOptions": {
-        "m_Filter": "30006",
+        "m_Filter": "",
         "m_UseRegularExpressions": false,
         "m_MatchCase": false
     },

@@ -5,11 +5,11 @@ using UnityEngine;
 
 namespace GoogleMobileAds.Api.Mediation
 {
-    public abstract class MediationExtras
+    public abstract class MediationExtrase
     {
         public Dictionary<string, string> Extras { get; protected set; }
 
-        public MediationExtras()
+        public MediationExtrase()
         {
             this.Extras = new Dictionary<string, string>();
         }

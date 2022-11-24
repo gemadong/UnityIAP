@@ -2,7 +2,7 @@ using System;
 
 namespace GoogleMobileAds.Api.Mediation.AdColony
 {
-    public class AdColonyMediationExtras : MediationExtras
+    public class AdColonyMediationExtras : MediationExtrase
     {
         public const string ShowPrePopupKey = "show_pre_popup";
         public const string ShowPostPopupKey = "show_post_popup";
