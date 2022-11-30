@@ -59,21 +59,21 @@ public class TestScene : MonoBehaviour
     private void Start()
     {
         FirebaseAnalytics.SetAnalyticsCollectionEnabled(true);
-        
+
         //Firebase Push (필요한 모든 종속 항목 이 시스템과 필요한 상태에 있는지 비동기적으로 확인하고 그렇지 않은 경우 수정을 시도)
-        //FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
-        //{
-        //    if (task.Result == DependencyStatus.Available)
-        //    {
-        //        FirebaseMessaging.TokenReceived += OnTokenReceived;
-        //        FirebaseMessaging.MessageReceived += OnMessageReceived;
-        //    }
-        //    else
-        //    {
-        //        Debug.LogError("Could not resolve all: " + task.Result);
-        //        Debug.LogError("Could not resolve all Firebase dependencies: " + task.Result);
-        //    }
-        //});
+        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
+        {
+            if (task.Result == DependencyStatus.Available)
+            {
+                FirebaseMessaging.TokenReceived += OnTokenReceived;
+                FirebaseMessaging.MessageReceived += OnMessageReceived;
+            }
+            else
+            {
+                Debug.LogError("Could not resolve all: " + task.Result);
+                Debug.LogError("Could not resolve all Firebase dependencies: " + task.Result);
+            }
+        });
         LoginButtonInstantiate();   //테스트!
 #if UNITY_ANDROID
         //루트 검사

@@ -10,12 +10,6 @@
     "m_KnownPackagesForSerialization": [
         {
             "deviceId": "127.0.0.1:5555",
-            "name": "com.miople.projectr",
-            "processId": 6199,
-            "exited": true
-        },
-        {
-            "deviceId": "127.0.0.1:5555",
             "name": "com.gemadong.unityiap",
             "processId": 4214,
             "exited": true
@@ -36,6 +30,12 @@
             "deviceId": "127.0.0.1:5555",
             "name": "com.bluestacks.launcher",
             "processId": 2331,
+            "exited": true
+        },
+        {
+            "deviceId": "127.0.0.1:5555",
+            "name": "com.bluestacks.launcher",
+            "processId": 2311,
             "exited": false
         },
         {
@@ -66,6 +66,12 @@
             "deviceId": "RF9RA00Z7ZT",
             "name": "com.miople.projectr",
             "processId": 6926,
+            "exited": false
+        },
+        {
+            "deviceId": "RF9RA00Z7ZT",
+            "name": "com.gemadong.unityiap",
+            "processId": 17318,
             "exited": false
         },
         {
